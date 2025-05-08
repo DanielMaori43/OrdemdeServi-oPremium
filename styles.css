@@ -354,7 +354,7 @@ body {
 }
 
 /* Ajustes responsivos */
-@media (max-width: 480px) {
+@media (max-width: 430px) {
   .option-item {
     padding: 15px 5px;
   }
