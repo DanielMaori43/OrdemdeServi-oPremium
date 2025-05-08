@@ -21,7 +21,7 @@ body {
   margin: 0 auto;
   padding: 0 10px; /* garante espaçamento lateral em telas pequenas */
 /*   background-color: #2d2424; */
-  background-image: url('/Public/imagem1.jpg');
+  background-image: url('Public/imagem1.jpg');
   min-height: 100vh;
   display: flex;
   flex-direction: column;
