@@ -12,13 +12,16 @@ body {
 }
 
 .container {
+  width: 100%;
   max-width: 430px;
   margin: 0 auto;
+  padding: 0 10px; /* garante espaçamento lateral em telas pequenas */
   background-color: #2d2424;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  border: #25d366;
+  margin-bottom: 12px;
+  margin-top: 10px;
 }
 
 .header {
