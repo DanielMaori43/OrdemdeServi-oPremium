@@ -3,11 +3,14 @@ const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const cors = require("cors")
+app.use(cors())
 
 // Middleware para processar JSON
 app.use(express.json());
 
 // Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, "public")))
 app.use(express.static(path.join(__dirname, "views")));
 
 // Conectar ao banco de dados SQLite
@@ -104,7 +107,7 @@ app.put("/api/ordens/:id/status", (req, res) => {
 
 // IMPORTANTE: Use esta rota específica em vez da rota catch-all "*"
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "index.html"));
+  res.sendFile(path.join(__dirname, "views", "public", "index.html"));
 });
 
 // Iniciar o servidor
