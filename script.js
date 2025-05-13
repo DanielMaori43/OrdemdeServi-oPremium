@@ -1,5 +1,21 @@
 const API_BASE = "https://ordemdeservi-opremium.onrender.com"
 
+// 1. Esta função deve vir primeiro:
+async function loadServiceOrders() {
+  try {
+    const response = await fetch(`${API_BASE}/api/ordens`)
+    if (!response.ok) {
+      throw new Error("Erro ao carregar ordens de serviço")
+    }
+    serviceOrders = await response.json()
+    return serviceOrders
+  } catch (error) {
+    console.error("Erro ao carregar ordens:", error)
+    return []
+  }
+}
+
+// 2. Depois vem o createServiceOrder que usa ela
 async function createServiceOrder(orderData) {
   try {
     const response = await fetch(`${API_BASE}/api/ordens`, {
@@ -15,7 +31,7 @@ async function createServiceOrder(orderData) {
     }
 
     const result = await response.json()
-    await loadServiceOrders()
+    await loadServiceOrders() // agora isso funciona
     return result
   } catch (error) {
     console.error("Erro:", error)
@@ -23,6 +39,7 @@ async function createServiceOrder(orderData) {
     throw error
   }
 }
+
 
 // Função para criar uma nova ordem de serviço
 async function createServiceOrder(orderData) {
