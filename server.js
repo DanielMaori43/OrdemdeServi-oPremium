@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "views")));
 
 // Conectar ao banco de dados SQLite
 const db = new sqlite3.Database("./database.sqlite", (err) => {
@@ -104,7 +104,7 @@ app.put("/api/ordens/:id/status", (req, res) => {
 
 // IMPORTANTE: Use esta rota específica em vez da rota catch-all "*"
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
 // Iniciar o servidor
