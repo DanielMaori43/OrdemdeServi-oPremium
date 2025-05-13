@@ -40,6 +40,18 @@ createTable().catch(console.error);
 // Rotas da API
 
 // GET uma ordem específica pelo ID
+
+app.get("/api/ordens", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM ordens_servico ORDER BY id DESC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 app.get("/api/ordens/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
