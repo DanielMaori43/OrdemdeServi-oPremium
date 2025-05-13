@@ -1,10 +1,11 @@
+const API_BASE = "https://ordemdeservi-opremium.onrender.com/" // seu link real
 // Variável global para armazenar as ordens de serviço
 let serviceOrders = []
 
 // Função para carregar todas as ordens do servidor
 async function loadServiceOrders() {
   try {
-    const response = await fetch("/api/ordens")
+    const response = await fetch(`${API_BASE}/api/ordens`)
     if (!response.ok) {
       throw new Error("Erro ao carregar ordens de serviço")
     }
@@ -20,7 +21,7 @@ async function loadServiceOrders() {
 // Função para criar uma nova ordem de serviço
 async function createServiceOrder(orderData) {
   try {
-    const response = await fetch("/api/ordens", {
+    const response = await fetch(`${API_BASE}/api/ordens`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,7 +49,7 @@ async function createServiceOrder(orderData) {
 // Função para atualizar o status de uma ordem
 async function updateOrderStatusAPI(orderId, newStatus) {
   try {
-    const response = await fetch(`/api/ordens/${orderId}/status`, {
+    const response = await fetch(`${API_BASE}/api/ordens/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +91,7 @@ async function migrateLocalStorageToServer() {
       let migratedCount = 0
       for (const order of localOrders) {
         try {
-          const response = await fetch("/api/ordens/migrate", {
+          const response = await fetch("${API_BASE}/api/ordens/migrate", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
