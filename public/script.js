@@ -1,20 +1,26 @@
-const API_BASE = "https://ordemdeservi-opremium.onrender.com/" // seu link real
-// Variável global para armazenar as ordens de serviço
-let serviceOrders = []
+const API_BASE = "https://ordemdeservi-opremium.onrender.com"
 
-// Função para carregar todas as ordens do servidor
-async function loadServiceOrders() {
+async function createServiceOrder(orderData) {
   try {
-    const response = await fetch(`${API_BASE}/api/ordens`)
+    const response = await fetch(`${API_BASE}/api/ordens`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderData),
+    })
+
     if (!response.ok) {
-      throw new Error("Erro ao carregar ordens de serviço")
+      throw new Error("Erro ao criar ordem de serviço")
     }
-    serviceOrders = await response.json()
-    return serviceOrders
+
+    const result = await response.json()
+    await loadServiceOrders()
+    return result
   } catch (error) {
     console.error("Erro:", error)
-    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.")
-    return []
+    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.")
+    throw error
   }
 }
 
