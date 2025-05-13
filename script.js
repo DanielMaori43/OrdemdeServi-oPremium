@@ -1,132 +1,5 @@
-// Variável global para armazenar as ordens de serviço
-let serviceOrders = []
-
-// Função para carregar todas as ordens do servidor
-async function loadServiceOrders() {
-  try {
-    const response = await fetch("/api/ordens")
-    if (!response.ok) {
-      throw new Error("Erro ao carregar ordens de serviço")
-    }
-    serviceOrders = await response.json()
-    return serviceOrders
-  } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.")
-    return []
-  }
-}
-
-// Função para criar uma nova ordem de serviço
-async function createServiceOrder(orderData) {
-  try {
-    const response = await fetch("/api/ordens", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(orderData),
-    })
-
-    if (!response.ok) {
-      throw new Error("Erro ao criar ordem de serviço")
-    }
-
-    const result = await response.json()
-
-    // Recarregar as ordens após criar uma nova
-    await loadServiceOrders()
-
-    return result
-  } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.")
-    throw error
-  }
-}
-
-// Função para atualizar o status de uma ordem
-async function updateOrderStatusAPI(orderId, newStatus) {
-  try {
-    const response = await fetch(`/api/ordens/${orderId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: newStatus }),
-    })
-
-    if (!response.ok) {
-      throw new Error("Erro ao atualizar status da ordem")
-    }
-
-    const result = await response.json()
-
-    // Recarregar as ordens após atualizar
-    await loadServiceOrders()
-
-    return result
-  } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.")
-    throw error
-  }
-}
-
-// Função para migrar dados do localStorage para o servidor
-async function migrateLocalStorageToServer() {
-  const localOrders = JSON.parse(localStorage.getItem("serviceOrders")) || []
-
-  if (localOrders.length > 0) {
-    if (
-      confirm(
-        "Foram encontradas " +
-          localOrders.length +
-          " ordens de serviço salvas localmente. Deseja migrá-las para o servidor?",
-      )
-    ) {
-      console.log("Iniciando migração de dados...")
-
-      let migratedCount = 0
-      for (const order of localOrders) {
-        try {
-          const response = await fetch("/api/ordens/migrate", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(order),
-          })
-
-          if (response.ok) {
-            migratedCount++
-            console.log(`Ordem #${order.id} migrada com sucesso`)
-          }
-        } catch (error) {
-          console.error(`Erro ao migrar ordem #${order.id}:`, error)
-        }
-      }
-
-      alert(`Migração concluída! ${migratedCount} de ${localOrders.length} ordens foram migradas para o servidor.`)
-
-      // Limpar localStorage apenas se todas as ordens foram migradas com sucesso
-      if (migratedCount === localOrders.length) {
-        localStorage.removeItem("serviceOrders")
-        localStorage.removeItem("currentOrderId")
-        console.log("Dados locais removidos após migração bem-sucedida")
-      }
-    }
-  }
-}
-
 // Wait for the DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", async () => {
-  // Primeiro, tente migrar os dados
-  await migrateLocalStorageToServer()
-
-  // Depois, carregue as ordens do servidor
-  await loadServiceOrders()
-
+document.addEventListener("DOMContentLoaded", () => {
   // Get all option items
   const optionItems = document.querySelectorAll(".option-item")
 
@@ -155,6 +28,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Open WhatsApp in a new tab
     window.open(whatsappUrl, "_blank")
   })
+
+  // Armazenamento local para ordens de serviço
+  const serviceOrders = JSON.parse(localStorage.getItem("serviceOrders")) || []
+  let currentOrderId = Number.parseInt(localStorage.getItem("currentOrderId")) || 1
+
+  // Função para salvar ordens no localStorage
+  function saveServiceOrders() {
+    localStorage.setItem("serviceOrders", JSON.stringify(serviceOrders))
+    localStorage.setItem("currentOrderId", currentOrderId.toString())
+  }
 
   // Function to handle specific option clicks
   function handleOptionClick(option) {
@@ -283,33 +166,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Manipular envio do formulário
     const form = modal.querySelector("#service-order-form")
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault()
 
       // Criar nova ordem de serviço
       const newOrder = {
+        id: currentOrderId++,
         clientName: document.getElementById("client-name").value,
         clientPhone: document.getElementById("client-phone").value,
         deviceType: document.getElementById("device-type").value,
         problemDescription: document.getElementById("problem-description").value,
         priority: document.getElementById("service-priority").value,
+        status: "pendente",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }
 
-      try {
-        // Enviar para o servidor
-        const result = await createServiceOrder(newOrder)
+      // Adicionar à lista de ordens
+      serviceOrders.push(newOrder)
 
-        // Mostrar confirmação
-        alert(`Ordem de Serviço #${result.id} criada com sucesso!`)
+      // Salvar no localStorage
+      saveServiceOrders()
 
-        // Fechar o modal
-        modal.style.opacity = "0"
-        setTimeout(() => {
-          modal.remove()
-        }, 300)
-      } catch (error) {
-        console.error("Erro ao criar ordem:", error)
-      }
+      // Mostrar confirmação
+      alert(`Ordem de Serviço #${newOrder.id} criada com sucesso!`)
+
+      // Fechar o modal
+      modal.style.opacity = "0"
+      setTimeout(() => {
+        modal.remove()
+      }, 300)
     })
   }
 
@@ -466,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Nova função para atualizar o status de uma ordem
-  async function updateOrderStatus(specificOrderId = null) {
+  function updateOrderStatus(specificOrderId = null) {
     // Verificar se existem ordens
     if (serviceOrders.length === 0) {
       alert("Não há ordens de serviço para atualizar.")
@@ -555,7 +441,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Manipular envio do formulário
     const form = modal.querySelector("#update-status-form")
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault()
 
       const orderId = Number.parseInt(document.getElementById("update-order-id").value)
@@ -609,20 +495,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             `Deseja realmente alterar o status da Ordem de Serviço #${order.id} de "${oldStatusText}" para "${newStatusText}"?`,
           )
         ) {
-          try {
-            // Atualizar status no servidor
-            await updateOrderStatusAPI(orderId, newStatus)
+          // Atualizar status
+          order.status = newStatus
+          order.updatedAt = new Date().toISOString()
 
-            alert(`Status da Ordem de Serviço #${order.id} atualizado com sucesso para "${newStatusText}".`)
+          // Salvar no localStorage
+          saveServiceOrders()
 
-            // Fechar o modal
-            modal.style.opacity = "0"
-            setTimeout(() => {
-              modal.remove()
-            }, 300)
-          } catch (error) {
-            console.error("Erro ao atualizar status:", error)
-          }
+          alert(`Status da Ordem de Serviço #${order.id} atualizado com sucesso para "${newStatusText}".`)
+
+          // Fechar o modal
+          modal.style.opacity = "0"
+          setTimeout(() => {
+            modal.remove()
+          }, 300)
         }
       } else {
         alert(`Ordem de serviço #${orderId} não encontrada.`)
@@ -745,336 +631,55 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Conteúdo da impressão
         printWindow.document.write(`
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title>Ordem de Serviço #${order.id}</title>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-      
-      body { 
-        font-family: 'Roboto', Arial, sans-serif; 
-        line-height: 1.6; 
-        color: #333;
-        margin: 0;
-        padding: 20px;
-        background-color: #f9f9f9;
-      }
-      
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: #fff;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      
-      .header {
-        background-image: url("/imagem2.jpg");
-        color: white;
-        padding: 20px;
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      
-      .logo-area {
-        width: 150px;
-        height: 80px;
-        background-color: rgba(255,255,255,0.9);
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px;
-      }
-      
-      .logo-area img {
-        max-width: 100%;
-        max-height: 100%;
-      }
-      
-      .title-area {
-        text-align: right;
-      }
-      
-      .title-area h1 {
-        margin: 0;
-        font-size: 28px;
-        font-weight: 700;
-      }
-      
-      .title-area .os-number {
-        font-size: 22px;
-        font-weight: 500;
-        margin-top: 5px;
-      }
-      
-      .title-area .date {
-        font-size: 14px;
-        margin-top: 10px;
-        opacity: 0.9;
-      }
-      
-      .content {
-        padding: 20px;
-      }
-      
-      .section {
-        margin-bottom: 25px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
-      }
-      
-      .section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-      }
-      
-      .section-title {
-        background-color: #f2f2f2;
-        padding: 8px 15px;
-        margin-bottom: 15px;
-        border-left: 5px solid #2d2424;
-        font-weight: 500;
-        font-size: 18px;
-      }
-      
-      .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-      }
-      
-      .info-item {
-        margin-bottom: 10px;
-      }
-      
-      .info-label {
-        font-weight: 500;
-        color: #666;
-        margin-bottom: 3px;
-        font-size: 14px;
-      }
-      
-      .info-value {
-        font-size: 16px;
-      }
-      
-      .full-width {
-        grid-column: 1 / -1;
-      }
-      
-      .status-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 14px;
-        font-weight: 500;
-        text-transform: uppercase;
-      }
-      
-      .status-pendente {
-        background-color: #fff3cd;
-        color: #856404;
-      }
-      
-      .status-em_andamento {
-        background-color: #cce5ff;
-        color: #004085;
-      }
-      
-      .status-concluido {
-        background-color: #d4edda;
-        color: #155724;
-      }
-      
-      .status-cancelado {
-        background-color: #f8d7da;
-        color: #721c24;
-      }
-      
-      .terms {
-        background-color: #f9f9f9;
-        padding: 15px;
-        border-radius: 5px;
-        font-size: 14px;
-      }
-      
-      .terms ol {
-        margin: 0;
-        padding-left: 20px;
-      }
-      
-      .terms li {
-        margin-bottom: 8px;
-      }
-      
-      .signatures {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 40px;
-      }
-      
-      .signature-line {
-        border-top: 1px solid #000;
-        width: 200px;
-        text-align: center;
-        padding-top: 5px;
-        font-size: 14px;
-      }
-      
-      .footer {
-        text-align: center;
-        margin-top: 30px;
-        font-size: 12px;
-        color: #777;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
-      }
-      
-      .print-button {
-        background-color: #2d2424;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 20px;
-        transition: background-color 0.3s;
-      }
-      
-      .print-button:hover {
-        background-color: #3d3434;
-      }
-      
-      @media print {
-        body {
-          background-color: #fff;
-          padding: 0;
-        }
-        
-        .container {
-          box-shadow: none;
-        }
-        
-        .print-button {
-          display: none;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <div class="logo-area">
-          <img src="/logo.jpeg" alt="Logo da Empresa">
-        </div>
-        <div class="title-area">
-          <h1>Ordem de Serviço</h1>
-          <div class="os-number">#${order.id}</div>
-          <div class="date">Data: ${createdDate}</div>
-        </div>
-      </div>
-      
-      <div class="content">
-        <div class="section">
-          <div class="section-title">Dados do Cliente</div>
-          <div class="info-grid">
-            <div class="info-item">
-              <div class="info-label">Nome:</div>
-              <div class="info-value">${order.clientName}</div>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Ordem de Serviço #${order.id}</title>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; }
+              .header { text-align: center; margin-bottom: 20px; }
+              .order-details { margin-bottom: 30px; }
+              .signatures { margin-top: 50px; display: flex; justify-content: space-between; }
+              .signature-line { border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px; }
+              @media print {
+                button { display: none; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Ordem de Serviço #${order.id}</h1>
+              <p>Data: ${createdDate}</p>
             </div>
-            <div class="info-item">
-              <div class="info-label">Telefone:</div>
-              <div class="info-value">${order.clientPhone}</div>
+            
+            <div class="order-details">
+              <h2>Dados do Cliente</h2>
+              <p><strong>Nome:</strong> ${order.clientName}</p>
+              <p><strong>Telefone:</strong> ${order.clientPhone}</p>
+              
+              <h2>Dados do Serviço</h2>
+              <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
+              <p><strong>Descrição do Problema:</strong> ${order.problemDescription}</p>
+              <p><strong>Prioridade:</strong> ${order.priority}</p>
+              <p><strong>Status:</strong> ${statusText}</p>
             </div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Dados do Serviço</div>
-          <div class="info-grid">
-            <div class="info-item">
-              <div class="info-label">Dispositivo:</div>
-              <div class="info-value">${order.deviceType}</div>
+            
+            <div class="terms">
+              <h2>Termos e Condições</h2>
+              <p>1. O prazo para conclusão do serviço será informado após avaliação técnica.</p>
+              <p>2. Garantia de 90 dias para os serviços realizados.</p>
+              <p>3. Equipamentos não retirados após 30 dias serão considerados abandonados.</p>
             </div>
-            <div class="info-item">
-              <div class="info-label">Prioridade:</div>
-              <div class="info-value">${order.priority.charAt(0).toUpperCase() + order.priority.slice(1)}</div>
+            
+            <div class="signatures">
+              <div class="signature-line">Assinatura do Cliente</div>
+              <div class="signature-line">Assinatura do Técnico</div>
             </div>
-            <div class="info-item full-width">
-              <div class="info-label">Descrição do Problema:</div>
-              <div class="info-value">${order.problemDescription}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Status:</div>
-              <div class="info-value">
-                <span class="status-badge status-${order.status}">${statusText}</span>
-              </div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Data de Criação:</div>
-              <div class="info-value">${createdDate}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Diagnóstico Técnico</div>
-          <div class="info-grid">
-            <div class="info-item full-width">
-              <div class="info-value" style="min-height: 60px; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Serviços Realizados</div>
-          <div class="info-grid">
-            <div class="info-item full-width">
-              <div class="info-value" style="min-height: 60px; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Termos e Condições</div>
-          <div class="terms">
-            <ol>
-              <li>O prazo para conclusão do serviço será informado após avaliação técnica.</li>
-              <li>Garantia de 90 dias para os serviços realizados.</li>
-              <li>Equipamentos não retirados após 30 dias serão considerados abandonados.</li>
-              <li>O cliente declara estar ciente e de acordo com os termos acima.</li>
-            </ol>
-          </div>
-        </div>
-        
-        <div class="signatures">
-          <div class="signature-line">Assinatura do Cliente</div>
-          <div class="signature-line">Assinatura do Técnico</div>
-        </div>
-        
-        <div class="footer">
-          <p>Sua Empresa de Assistência Técnica - Rua Exemplo, 123 - Cidade - Estado</p>
-          <p>contato@suaempresa.com | (00) 0000-0000</p>
-        </div>
-      </div>
-    </div>
-    
-    <div style="text-align: center; margin-top: 20px;">
-      <button onclick="window.print(); window.close();" class="print-button">Imprimir</button>
-    </div>
-  </body>
-  </html>
-`)
+            
+            <button onclick="window.print(); window.close();" style="margin-top: 30px; padding: 10px;">Imprimir</button>
+          </body>
+          </html>
+        `)
 
         printWindow.document.close()
 
@@ -1090,7 +695,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Função para cancelar última ordem de serviço
-  async function cancelLastServiceOrder() {
+  function cancelLastServiceOrder() {
     // Verificar se existem ordens
     if (serviceOrders.length === 0) {
       alert("Não há ordens de serviço para cancelar.")
@@ -1098,30 +703,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Encontrar a última ordem não cancelada
-    let lastOrder = null
-    for (let i = 0; i < serviceOrders.length; i++) {
+    let lastOrderIndex = -1
+    for (let i = serviceOrders.length - 1; i >= 0; i--) {
       if (serviceOrders[i].status !== "cancelado") {
-        lastOrder = serviceOrders[i]
+        lastOrderIndex = i
         break
       }
     }
 
-    if (!lastOrder) {
+    if (lastOrderIndex === -1) {
       alert("Não há ordens de serviço ativas para cancelar.")
       return
     }
 
+    const lastOrder = serviceOrders[lastOrderIndex]
+
     // Confirmar cancelamento
     if (confirm(`Deseja realmente cancelar a Ordem de Serviço #${lastOrder.id} para ${lastOrder.clientName}?`)) {
-      try {
-        // Atualizar status no servidor
-        await updateOrderStatusAPI(lastOrder.id, "cancelado")
+      // Atualizar status
+      lastOrder.status = "cancelado"
+      lastOrder.updatedAt = new Date().toISOString()
 
-        alert(`Ordem de Serviço #${lastOrder.id} cancelada com sucesso.`)
-      } catch (error) {
-        console.error("Erro:", error)
-        alert("Não foi possível cancelar a ordem. Tente novamente mais tarde.")
-      }
+      // Salvar no localStorage
+      saveServiceOrders()
+
+      alert(`Ordem de Serviço #${lastOrder.id} cancelada com sucesso.`)
     }
   }
 
@@ -1278,34 +884,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const finishButtons = modal.querySelectorAll(".finish-btn")
     finishButtons.forEach((button) => {
-      button.addEventListener("click", async function () {
+      button.addEventListener("click", function () {
         const orderId = Number.parseInt(this.getAttribute("data-id"))
+        finishSpecificOrder(orderId)
 
-        try {
-          // Confirmar finalização
-          if (confirm(`Deseja realmente finalizar a Ordem de Serviço #${orderId}?`)) {
-            // Atualizar status no servidor
-            await updateOrderStatusAPI(orderId, "concluido")
+        // Atualizar a lista
+        modal.style.opacity = "0"
+        setTimeout(() => {
+          modal.remove()
 
-            alert(`Ordem de Serviço #${orderId} finalizada com sucesso.`)
-
-            // Atualizar a lista
-            modal.style.opacity = "0"
-            setTimeout(() => {
-              modal.remove()
-
-              // Reabrir a lista atualizada
-              if (title === "Ordens de Serviço Pendentes") {
-                searchPendingOrders()
-              } else {
-                searchCompletedOrders()
-              }
-            }, 300)
+          // Reabrir a lista atualizada
+          if (title === "Ordens de Serviço Pendentes") {
+            searchPendingOrders()
+          } else {
+            searchCompletedOrders()
           }
-        } catch (error) {
-          console.error("Erro:", error)
-          alert("Não foi possível finalizar a ordem. Tente novamente mais tarde.")
-        }
+        }, 300)
       })
     })
   }
@@ -1438,33 +1032,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const finishButton = modal.querySelector(".finish-detail-btn")
     if (finishButton) {
-      finishButton.addEventListener("click", async function () {
+      finishButton.addEventListener("click", function () {
         const orderId = Number.parseInt(this.getAttribute("data-id"))
 
-        try {
-          // Confirmar finalização
-          if (confirm(`Deseja realmente finalizar a Ordem de Serviço #${orderId}?`)) {
-            // Atualizar status no servidor
-            await updateOrderStatusAPI(orderId, "concluido")
+        // Fechar modal atual
+        modal.style.opacity = "0"
+        setTimeout(() => {
+          modal.remove()
 
-            alert(`Ordem de Serviço #${orderId} finalizada com sucesso.`)
-
-            // Fechar modal atual
-            modal.style.opacity = "0"
-            setTimeout(() => {
-              modal.remove()
-            }, 300)
-          }
-        } catch (error) {
-          console.error("Erro:", error)
-          alert("Não foi possível finalizar a ordem. Tente novamente mais tarde.")
-        }
+          // Finalizar ordem
+          finishSpecificOrder(orderId)
+        }, 300)
       })
     }
   }
 
+  // Função para finalizar uma ordem específica
+  function finishSpecificOrder(orderId) {
+    const order = serviceOrders.find((order) => order.id === orderId)
+
+    if (!order) {
+      alert(`Ordem de serviço #${orderId} não encontrada.`)
+      return
+    }
+
+    // Confirmar finalização
+    if (confirm(`Deseja realmente finalizar a Ordem de Serviço #${order.id} para ${order.clientName}?`)) {
+      // Atualizar status
+      order.status = "concluido"
+      order.updatedAt = new Date().toISOString()
+
+      // Salvar no localStorage
+      saveServiceOrders()
+
+      alert(`Ordem de Serviço #${order.id} finalizada com sucesso.`)
+    }
+  }
+
   // Função para finalizar ordem (genérica)
-  async function finishOrder() {
+  function finishOrder() {
     // Verificar se existem ordens
     if (serviceOrders.length === 0) {
       alert("Não há ordens de serviço para finalizar.")
@@ -1544,29 +1150,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Manipular envio do formulário
     const form = modal.querySelector("#finish-form")
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault()
 
       const orderId = Number.parseInt(document.getElementById("finish-order-id").value)
 
-      try {
-        // Confirmar finalização
-        if (confirm(`Deseja realmente finalizar a Ordem de Serviço #${orderId}?`)) {
-          // Atualizar status no servidor
-          await updateOrderStatusAPI(orderId, "concluido")
+      // Finalizar a ordem específica
+      finishSpecificOrder(orderId)
 
-          alert(`Ordem de Serviço #${orderId} finalizada com sucesso.`)
-
-          // Fechar o modal
-          modal.style.opacity = "0"
-          setTimeout(() => {
-            modal.remove()
-          }, 300)
-        }
-      } catch (error) {
-        console.error("Erro:", error)
-        alert("Não foi possível finalizar a ordem. Tente novamente mais tarde.")
-      }
+      // Fechar o modal
+      modal.style.opacity = "0"
+      setTimeout(() => {
+        modal.remove()
+      }, 300)
     })
   }
 
