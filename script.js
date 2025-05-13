@@ -114,7 +114,7 @@ async function migrateLocalStorageToServer() {
       let migratedCount = 0
       for (const order of localOrders) {
         try {
-          const response = await fetch("${API_BASE}/api/ordens/migrate", {
+          const response = await fetch(`${API_BASE}/api/ordens/migrate`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
