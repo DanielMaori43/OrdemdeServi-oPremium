@@ -1,42 +1,23 @@
-const API_BASE = "https://ordemdeservi-opremium.onrender.com"
+ 
+// URL base da sua API no Render
+const API_BASE = "https://ordemdeservi-opremium.onrender.com";
 
-// 1. Esta função deve vir primeiro:
+// Variável global para armazenar as ordens
+let serviceOrders = [];
+
+// Função para carregar todas as ordens do servidor
 async function loadServiceOrders() {
   try {
-    const response = await fetch(`${API_BASE}/api/ordens`)
+    const response = await fetch(`${API_BASE}/api/ordens`);
     if (!response.ok) {
-      throw new Error("Erro ao carregar ordens de serviço")
+      throw new Error("Erro ao carregar ordens de serviço");
     }
-    serviceOrders = await response.json()
-    return serviceOrders
+    serviceOrders = await response.json();
+    return serviceOrders;
   } catch (error) {
-    console.error("Erro ao carregar ordens:", error)
-    return []
-  }
-}
-
-// 2. Depois vem o createServiceOrder que usa ela
-async function createServiceOrder(orderData) {
-  try {
-    const response = await fetch(`${API_BASE}/api/ordens`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(orderData),
-    })
-
-    if (!response.ok) {
-      throw new Error("Erro ao criar ordem de serviço")
-    }
-
-    const result = await response.json()
-    await loadServiceOrders() // agora isso funciona
-    return result
-  } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.")
-    throw error
+    console.error("Erro:", error);
+    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.");
+    return [];
   }
 }
 
@@ -49,22 +30,22 @@ async function createServiceOrder(orderData) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(orderData),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error("Erro ao criar ordem de serviço")
+      throw new Error("Erro ao criar ordem de serviço");
     }
 
-    const result = await response.json()
+    const result = await response.json();
 
     // Recarregar as ordens após criar uma nova
-    await loadServiceOrders()
+    await loadServiceOrders();
 
-    return result
+    return result;
   } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.")
-    throw error
+    console.error("Erro:", error);
+    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.");
+    throw error;
   }
 }
 
@@ -77,22 +58,22 @@ async function updateOrderStatusAPI(orderId, newStatus) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ status: newStatus }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error("Erro ao atualizar status da ordem")
+      throw new Error("Erro ao atualizar status da ordem");
     }
 
-    const result = await response.json()
+    const result = await response.json();
 
     // Recarregar as ordens após atualizar
-    await loadServiceOrders()
+    await loadServiceOrders();
 
-    return result
+    return result;
   } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.")
-    throw error
+    console.error("Erro:", error);
+    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.");
+    throw error;
   }
 }
 
@@ -113,7 +94,7 @@ async function migrateLocalStorageToServer() {
       let migratedCount = 0
       for (const order of localOrders) {
         try {
-          const response = await fetch("${API_BASE}/api/ordens/migrate", {
+          const response = await fetch(`${API_BASE}/api/ordens/migrate`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
