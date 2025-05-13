@@ -10,8 +10,8 @@ app.use(cors())
 app.use(express.json());
 
 // Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, "public")))
 app.use(express.static(path.join(__dirname, "views")));
+app.use(express.static(path.join(__dirname, "public")))
 
 // Conectar ao banco de dados SQLite
 const db = new sqlite3.Database("./database.sqlite", (err) => {
