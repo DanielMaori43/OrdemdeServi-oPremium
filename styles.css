@@ -6,7 +6,7 @@
 }
 
 body {
-  background-image: url("imagem1.jpg");
+  background-image: url("views/imagem1.jpg");
   color: #333;
   margin-top: 3px;
   margin-bottom: 5px;
@@ -24,7 +24,7 @@ body {
 
 /* Header styles */
 .header {
-  background-image: url("imagem2.jpg");
+  background-image: url("views/imagem2.jpg");
   padding: 20px;
   text-align: center;
   border-bottom: 1px solid #ccc;
