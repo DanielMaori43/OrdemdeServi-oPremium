@@ -1,123 +1,110 @@
 const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
+const { Pool } = require("pg");
+const cors = require("cors");
 const path = require("path");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-const cors = require("cors")
-app.use(cors())
 
-// Middleware para processar JSON
-app.use(express.json());
-
-// Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
-
-// Conectar ao banco de dados SQLite
-const db = new sqlite3.Database("./database.sqlite", (err) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.message);
-  } else {
-    console.log("Conectado ao banco de dados SQLite");
-    
-    // Criar tabela de ordens de serviço se não existir
-    db.run(`
-      CREATE TABLE IF NOT EXISTS ordens_servico (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        clientName TEXT NOT NULL,
-        clientPhone TEXT NOT NULL,
-        deviceType TEXT NOT NULL,
-        problemDescription TEXT NOT NULL,
-        priority TEXT NOT NULL,
-        status TEXT NOT NULL,
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      )
-    `);
+// Conexão com PostgreSQL no Render
+const pool = new Pool({
+  connectionString: "postgresql://ordens_servico_db_user:I0TFfW1JebXihjJVGMvAXHIAjcYyKdQV@dpg-d0hs9g3uibrs739nkvsg-a/ordens_servico_db",
+  ssl: {
+    rejectUnauthorized: false
   }
 });
 
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+// Criar tabela se não existir
+const createTable = async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ordens_servico (
+      id SERIAL PRIMARY KEY,
+      clientName TEXT NOT NULL,
+      clientPhone TEXT NOT NULL,
+      deviceType TEXT NOT NULL,
+      problemDescription TEXT NOT NULL,
+      priority TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pendente',
+      createdAt TIMESTAMP NOT NULL,
+      updatedAt TIMESTAMP NOT NULL
+    );
+  `);
+};
+
+createTable().catch(console.error);
+
 // Rotas da API
 
-// Obter todas as ordens
-app.get("/api/ordens", (req, res) => {
-  db.all("SELECT * FROM ordens_servico ORDER BY id DESC", [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(rows);
-  });
+// GET todas as ordens
+app.get("/api/ordens", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM ordens_servico ORDER BY id DESC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Obter uma ordem específica
-app.get("/api/ordens/:id", (req, res) => {
-  db.get("SELECT * FROM ordens_servico WHERE id = ?", [req.params.id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (!row) {
+// GET uma ordem específica
+app.get("/api/ordens/:id", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM ordens_servico WHERE id = $1", [req.params.id]);
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: "Ordem não encontrada" });
     }
-    res.json(row);
-  });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Criar nova ordem
-app.post("/api/ordens", (req, res) => {
+// POST nova ordem
+app.post("/api/ordens", async (req, res) => {
   const { clientName, clientPhone, deviceType, problemDescription, priority } = req.body;
-  const now = new Date().toISOString();
-  
-  db.run(
-    "INSERT INTO ordens_servico (clientName, clientPhone, deviceType, problemDescription, priority, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [clientName, clientPhone, deviceType, problemDescription, priority, "pendente", now, now],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      
-      res.json({
-        id: this.lastID,
-        message: "Ordem de serviço criada com sucesso"
-      });
-    }
-  );
+  const now = new Date();
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO ordens_servico (clientName, clientPhone, deviceType, problemDescription, priority, status, createdAt, updatedAt)
+       VALUES ($1, $2, $3, $4, $5, 'pendente', $6, $6) RETURNING id`,
+      [clientName, clientPhone, deviceType, problemDescription, priority, now]
+    );
+    res.json({ id: result.rows[0].id, message: "Ordem de serviço criada com sucesso" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Atualizar status de uma ordem
-app.put("/api/ordens/:id/status", (req, res) => {
+// PUT atualizar status
+app.put("/api/ordens/:id/status", async (req, res) => {
   const { status } = req.body;
-  const now = new Date().toISOString();
-  
-  db.run(
-    "UPDATE ordens_servico SET status = ?, updatedAt = ? WHERE id = ?",
-    [status, now, req.params.id],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      
-      if (this.changes === 0) {
-        return res.status(404).json({ error: "Ordem não encontrada" });
-      }
-      
-      res.json({ message: "Status atualizado com sucesso" });
+  const now = new Date();
+
+  try {
+    const result = await pool.query(
+      "UPDATE ordens_servico SET status = $1, updatedAt = $2 WHERE id = $3 RETURNING *",
+      [status, now, req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Ordem não encontrada" });
     }
-  );
+
+    res.json({ message: "Status atualizado com sucesso" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// IMPORTANTE: Use esta rota específica em vez da rota catch-all "*"
+// Página inicial
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-});
-
-// Fechar a conexão com o banco de dados quando o servidor for encerrado
-process.on("SIGINT", () => {
-  db.close(() => {
-    console.log("Conexão com o banco de dados fechada");
-    process.exit(0);
-  });
 });
