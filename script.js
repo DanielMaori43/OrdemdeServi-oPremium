@@ -1,8 +1,6 @@
- 
-// URL base da sua API no Render
 const API_BASE = "https://ordemdeservi-opremium.onrender.com";
 
-// Variável global para armazenar as ordens
+// Variável global
 let serviceOrders = [];
 
 // Função para carregar todas as ordens do servidor
@@ -12,6 +10,7 @@ async function loadServiceOrders() {
     if (!response.ok) {
       throw new Error("Erro ao carregar ordens de serviço");
     }
+
     serviceOrders = await response.json();
     return serviceOrders;
   } catch (error) {
