@@ -230,12 +230,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <h2>Nova Ordem de Serviço</h2>
                 <form id="service-order-form">
                     <div class="form-group">
-                        <label for="ordem.clientname">Nome do Cliente:</label>
-                        <input type="text" id="ordem.clientname" required>
+                        <label for="clientname">Nome do Cliente:</label>
+                        <input type="text" id="clientname" required>
                     </div>
                     <div class="form-group">
-                        <label for="client-phone">Telefone:</label>
-                        <input type="tel" id="client-phone" required>
+                        <label for="clientphone">Telefone:</label>
+                        <input type="tel" id="clientphone" required>
                     </div>
                     <div class="form-group">
                         <label for="device-type">Tipo de Dispositivo:</label>
@@ -291,8 +291,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Criar nova ordem de serviço
       const newOrder = {
-        clientName: document.getElementById("client-name").value,
-        clientPhone: document.getElementById("client-phone").value,
+        clientName: document.getElementById("clientname").value,
+        clientPhone: document.getElementById("clientphone").value,
         deviceType: document.getElementById("device-type").value,
         problemDescription: document.getElementById("problem-description").value,
         priority: document.getElementById("service-priority").value,
