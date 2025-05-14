@@ -230,8 +230,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <h2>Nova Ordem de Serviço</h2>
                 <form id="service-order-form">
                     <div class="form-group">
-                        <label for="client-name">Nome do Cliente:</label>
-                        <input type="text" id="client-name" required>
+                        <label for="ordem.clientname">Nome do Cliente:</label>
+                        <input type="text" id="ordem.clientname" required>
                     </div>
                     <div class="form-group">
                         <label for="client-phone">Telefone:</label>
