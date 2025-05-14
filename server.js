@@ -183,11 +183,11 @@ app.post("/api/ordens/migrate", async (req, res) => {
 
     // Adaptar os nomes dos campos para o formato do banco
     const clientname = order.clientName || order.clientname
-const clientphone = order.clientPhone || order.clientphone
-const devicetype = order["device-Type"] || order["device-type"]
-const problemdescription = order["problem-Description"] || order["problem-description"]
-const createdat = order.createdAt || order.createdat || now
-const updatedat = order.updatedAt || order.updatedat || now
+    const clientphone = order.clientPhone || order.clientphone
+    const devicetype = order["device-Type"] || order["device-type"] || order.deviceType || order.devicetype
+    const problemdescription = order["problem-Description"] || order["problem-description"] || order.problemDescription || order.problemdescription
+    const createdat = order.createdAt || order.createdat || now
+    const updatedat = order.updatedAt || order.updatedat || now
     console.log("Dados normalizados para migração:", {
       clientname,
       clientphone,
