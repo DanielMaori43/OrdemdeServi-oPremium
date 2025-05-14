@@ -203,8 +203,8 @@ app.post("/api/ordens/migrate", async (req, res) => {
       [
         clientname,
         clientphone,
-        device-type,
-        problem-description,
+        devicetype,             
+        problemdescription,     
         order.priority,
         order.status || "pendente",
         createdat,
