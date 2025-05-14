@@ -2,6 +2,7 @@ const express = require("express")
 const { Pool } = require("pg")
 const cors = require("cors")
 const path = require("path")
+const fs = require("fs")
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -93,15 +94,12 @@ app.post("/api/ordens", async (req, res) => {
   try {
     console.log("Recebendo nova ordem:", req.body)
 
-    // Extrair campos do corpo da requisição
-    // Aceitar tanto camelCase quanto lowercase
     const clientName = req.body.clientName || req.body.clientname
     const clientPhone = req.body.clientPhone || req.body.clientphone
     const deviceType = req.body.deviceType || req.body.devicetype
     const problemDescription = req.body.problemDescription || req.body.problemdescription
     const priority = req.body.priority
 
-    // Verificar se todos os campos necessários estão presentes
     if (!clientName || !clientPhone || !deviceType || !problemDescription || !priority) {
       console.error("Campos obrigatórios ausentes:", {
         clientName,
@@ -181,13 +179,13 @@ app.post("/api/ordens/migrate", async (req, res) => {
 
     const now = new Date()
 
-    // Adaptar os nomes dos campos para o formato do banco
     const clientname = order.clientName || order.clientname
     const clientphone = order.clientPhone || order.clientphone
     const devicetype = order["device-Type"] || order["device-type"] || order.deviceType || order.devicetype
     const problemdescription = order["problem-Description"] || order["problem-description"] || order.problemDescription || order.problemdescription
     const createdat = order.createdAt || order.createdat || now
     const updatedat = order.updatedAt || order.updatedat || now
+
     console.log("Dados normalizados para migração:", {
       clientname,
       clientphone,
@@ -224,16 +222,20 @@ app.post("/api/ordens/migrate", async (req, res) => {
   }
 })
 
-// Página inicial
+// Página inicial - serve apenas se o arquivo existir
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"))
+  const indexPath = path.join(__dirname, "public", "index.html")
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath)
+  } else {
+    res.status(404).send("Página não encontrada.")
+  }
 })
 
 // Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`)
 })
-
 
 // Fechar a conexão com o banco de dados quando o servidor for encerrado
 process.on("SIGINT", () => {
