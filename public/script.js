@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
       ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
@@ -409,7 +409,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (order) {
         // Formatar data
-        const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+        const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
         const updatedDate = new Date(order.updatedat).toLocaleDateString("pt-BR")
 
         // Traduzir status
@@ -507,7 +507,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
       ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
@@ -670,7 +670,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
       ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
@@ -727,7 +727,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const printWindow = window.open("", "_blank")
 
         // Formatar data
-        const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+        const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
         // Traduzir status
         let statusText = ""
@@ -1178,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       orders.forEach((order) => {
         // Formatar data
-        const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+        const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
         // Traduzir status
         let statusText = ""
@@ -1329,7 +1329,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     modal.className = "modal"
 
     // Formatar datas
-    const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+    const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
     const updatedDate = new Date(order.updatedat).toLocaleDateString("pt-BR")
 
     // Traduzir status
@@ -1505,7 +1505,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
       ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
@@ -1610,7 +1610,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
       ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
@@ -1672,7 +1672,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h3>Ordem Criada</h3>
-              <p>${new Date(order.createdAt).toLocaleDateString("pt-BR")}</p>
+              <p>${new Date(order.createdat).toLocaleDateString("pt-BR")}</p>
             </div>
           </div>
       `
@@ -1788,7 +1788,7 @@ Aqui está o status atual do seu serviço:
 
 📱 *Dispositivo:* ${order.device-type}
 🔧 *Status:* ${statusText}
-📅 *Data de criação:* ${new Date(order.createdAt).toLocaleDateString("pt-BR")}
+📅 *Data de criação:* ${new Date(order.createdat).toLocaleDateString("pt-BR")}
 ${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedat).toLocaleDateString("pt-BR")}` : ""}
 
 Agradecemos a preferência!
