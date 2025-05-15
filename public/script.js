@@ -431,24 +431,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             statusText = order.status
         }
 
-        // Mostrar resultado com botão para atualizar status
-        resultDiv.innerHTML = `
+         // Mostrar resultado com botão para atualizar status
+        resultDiv.innerHTML = 
           <h3>Ordem de Serviço #${order.id}</h3>
           <p><strong>Cliente:</strong> ${order.clientname}</p>
           <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
           <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
           <p><strong>Criada em:</strong> ${createdDate}</p>
           <p><strong>Última atualização:</strong> ${updatedDate}</p>
-   ${
-    order.status !== "concluido" && order.status !== "cancelado"
-      ? `<div class="action-buttons">
-            <button id="update-status-btn" class="update-status-btn" data-id="${order.id}">
-              Atualizar Status
-            </button>
-         </div>`
-      : ""
-  }
-
+          ${
+            order.status !== "concluido" && order.status !== "cancelado"
+              ? <div class="action-buttons">
+                  <button id="update-status-btn" class="update-status-btn" data-id="${order.id}">Atualizar Status</button>
+                </div>
+              : ""
+          }
         // Adicionar event listener para o botão de atualizar status
         const updateStatusBtn = document.getElementById("update-status-btn")
         if (updateStatusBtn) {
