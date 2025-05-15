@@ -231,12 +231,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <h2>Nova Ordem de Serviço</h2>
                 <form id="service-order-form">
                     <div class="form-group">
-                        <label for="clientName">Nome do Cliente:</label>
-                        <input type="text" id="clientName" required>
+                        <label for="clientname">Nome do Cliente:</label>
+                        <input type="text" id="clientname" required>
                     </div>
                     <div class="form-group">
-                        <label for="clientPhone">Telefone:</label>
-                        <input type="tel" id="clientPhone" required>
+                        <label for="clientphone">Telefone:</label>
+                        <input type="tel" id="clientphone" required>
                     </div>
                     <div class="form-group">
                         <label for="devicetype">Tipo de Dispositivo:</label>
@@ -292,10 +292,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Criar nova ordem de serviço
       const newOrder = {
-        clientname: document.getElementById("clientName").value,
-        clientphone: document.getElementById("clientPhone").value,
+        clientname: document.getElementById("clientname").value,
+        clientphone: document.getElementById("clientphone").value,
         devicetype: document.getElementById("devicetype").value,
-        problemdescription: document.getElementById("problem-description").value,
+        problemdescription: document.getElementById("problemdescription").value,
         priority: document.getElementById("service-priority").value,
       }
       
@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -434,7 +434,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Mostrar resultado com botão para atualizar status
         resultDiv.innerHTML = `
           <h3>Ordem de Serviço #${order.id}</h3>
-          <p><strong>Cliente:</strong> ${order.clientName}</p>
+          <p><strong>Cliente:</strong> ${order.clientname}</p>
           <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
           <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
           <p><strong>Criada em:</strong> ${createdDate}</p>
@@ -510,7 +510,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientname} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -673,7 +673,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1117,7 +1117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Confirmar cancelamento
-    if (confirm(`Deseja realmente cancelar a Ordem de Serviço #${lastOrder.id} para ${lastOrder.clientName}?`)) {
+    if (confirm(`Deseja realmente cancelar a Ordem de Serviço #${lastOrder.id} para ${lastOrder.clientname}?`)) {
       try {
         // Atualizar status no servidor
         await updateOrderStatusAPI(lastOrder.id, "cancelado")
@@ -1202,7 +1202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ordersHTML += `
                     <tr>
                         <td>${order.id}</td>
-                        <td>${order.clientName}</td>
+                        <td>${order.clientname}</td>
                         <td>${order.devicetype}</td>
                         <td>${createdDate}</td>
                         <td class="status-${order.status}">${statusText}</td>
@@ -1357,10 +1357,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <span class="close-button">&times;</span>
                 <h2>Detalhes da Ordem #${order.id}</h2>
                 <div class="order-details">
-                    <p><strong>Cliente:</strong> ${order.clientName}</p>
-                    <p><strong>Telefone:</strong> ${order.clientPhone}</p>
+                    <p><strong>Cliente:</strong> ${order.clientname}</p>
+                    <p><strong>Telefone:</strong> ${order.clientphone}</p>
                     <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
-                    <p><strong>Problema:</strong> ${order.problem-description}</p>
+                    <p><strong>Problema:</strong> ${order.problemdescription}</p>
                     <p><strong>Prioridade:</strong> ${order.priority}</p>
                     <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
                     <p><strong>Criada em:</strong> ${createdDate}</p>
