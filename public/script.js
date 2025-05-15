@@ -991,11 +991,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Nome:</div>
-              <div class="info-value">${order.clientName}</div>
+              <div class="info-value">${order.clientname}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Telefone:</div>
-              <div class="info-value">${order.clientPhone}</div>
+              <div class="info-value">${order.clientphone}</div>
             </div>
           </div>
         </div>
