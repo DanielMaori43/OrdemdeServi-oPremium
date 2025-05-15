@@ -250,8 +250,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="problem-description">Descrição do Problema:</label>
-                        <textarea id="problem-description" rows="4" required></textarea>
+                        <label for="problemdescription">Descrição do Problema:</label>
+                        <textarea id="problemdescription" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="service-priority">Prioridade:</label>
