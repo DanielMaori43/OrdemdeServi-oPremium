@@ -1013,7 +1013,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             <div class="info-item full-width">
               <div class="info-label">Descrição do Problema:</div>
-              <div class="info-value">${order.problem-description}</div>
+              <div class="info-value">${order.problemdescription}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Status:</div>
