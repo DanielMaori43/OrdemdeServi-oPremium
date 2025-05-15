@@ -1203,7 +1203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <tr>
                         <td>${order.id}</td>
                         <td>${order.clientName}</td>
-                        <td>${order.device-type}</td>
+                        <td>${order.devicetype}</td>
                         <td>${createdDate}</td>
                         <td class="status-${order.status}">${statusText}</td>
                         <td>
