@@ -1,75 +1,79 @@
-// Variável global para armazenar as ordens de serviço
-let serviceOrders = []
+ 
+// URL base da sua API no Render
+const API_BASE = "https://ordemdeservi-opremium.onrender.com";
+
+// Variável global para armazenar as ordens
+let serviceOrders = [];
 
 // Função para carregar todas as ordens do servidor
 async function loadServiceOrders() {
   try {
-    const response = await fetch("/api/ordens")
+    const response = await fetch(`${API_BASE}/api/ordens`);
     if (!response.ok) {
-      throw new Error("Erro ao carregar ordens de serviço")
+      throw new Error("Erro ao carregar ordens de serviço");
     }
-    serviceOrders = await response.json()
-    return serviceOrders
+    serviceOrders = await response.json();
+    return serviceOrders;
   } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.")
-    return []
+    console.error("Erro:", error);
+    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.");
+    return [];
   }
 }
 
 // Função para criar uma nova ordem de serviço
 async function createServiceOrder(orderData) {
   try {
-    const response = await fetch("/api/ordens", {
+    const response = await fetch(`${API_BASE}/api/ordens`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(orderData),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error("Erro ao criar ordem de serviço")
+      throw new Error("Erro ao criar ordem de serviço");
     }
 
-    const result = await response.json()
+    const result = await response.json();
 
     // Recarregar as ordens após criar uma nova
-    await loadServiceOrders()
+    await loadServiceOrders();
 
-    return result
+    return result;
   } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.")
-    throw error
+    console.error("Erro:", error);
+    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.");
+    throw error;
   }
 }
 
 // Função para atualizar o status de uma ordem
 async function updateOrderStatusAPI(orderId, newStatus) {
   try {
-    const response = await fetch(`/api/ordens/${orderId}/status`, {
+    const response = await fetch(`${API_BASE}/api/ordens/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ status: newStatus }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error("Erro ao atualizar status da ordem")
+      throw new Error("Erro ao atualizar status da ordem");
     }
 
-    const result = await response.json()
+    const result = await response.json();
 
     // Recarregar as ordens após atualizar
-    await loadServiceOrders()
+    await loadServiceOrders();
 
-    return result
+    return result;
   } catch (error) {
-    console.error("Erro:", error)
-    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.")
-    throw error
+    console.error("Erro:", error);
+    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.");
+    throw error;
   }
 }
 
@@ -90,7 +94,7 @@ async function migrateLocalStorageToServer() {
       let migratedCount = 0
       for (const order of localOrders) {
         try {
-          const response = await fetch("/api/ordens/migrate", {
+          const response = await fetch(`${API_BASE}/api/ordens/migrate`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -227,16 +231,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <h2>Nova Ordem de Serviço</h2>
                 <form id="service-order-form">
                     <div class="form-group">
-                        <label for="client-name">Nome do Cliente:</label>
-                        <input type="text" id="client-name" required>
+                        <label for="clientName">Nome do Cliente:</label>
+                        <input type="text" id="clientName" required>
                     </div>
                     <div class="form-group">
-                        <label for="client-phone">Telefone:</label>
-                        <input type="tel" id="client-phone" required>
+                        <label for="clientPhone">Telefone:</label>
+                        <input type="tel" id="clientPhone" required>
                     </div>
                     <div class="form-group">
-                        <label for="device-type">Tipo de Dispositivo:</label>
-                        <select id="device-type" required>
+                        <label for="device-Type">Tipo de Dispositivo:</label>
+                        <select id="device-Type" required>
                             <option value="">Selecione...</option>
                             <option value="notebook">Notebook</option>
                             <option value="desktop">Desktop</option>
@@ -288,12 +292,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Criar nova ordem de serviço
       const newOrder = {
-        clientName: document.getElementById("client-name").value,
-        clientPhone: document.getElementById("client-phone").value,
-        deviceType: document.getElementById("device-type").value,
-        problemDescription: document.getElementById("problem-description").value,
+        clientname: document.getElementById("clientName").value,
+        clientphone: document.getElementById("clientPhone").value,
+        devicetype: document.getElementById("device-Type").value,
+        problemdescription: document.getElementById("problem-description").value,
         priority: document.getElementById("service-priority").value,
       }
+      
 
       try {
         // Enviar para o servidor
@@ -348,10 +353,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-Type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -404,8 +409,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (order) {
         // Formatar data
-        const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
-        const updatedDate = new Date(order.updatedAt).toLocaleDateString("pt-BR")
+        const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
+        const updatedDate = new Date(order.updatedat).toLocaleDateString("pt-BR")
 
         // Traduzir status
         let statusText = ""
@@ -430,7 +435,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resultDiv.innerHTML = `
           <h3>Ordem de Serviço #${order.id}</h3>
           <p><strong>Cliente:</strong> ${order.clientName}</p>
-          <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
+          <p><strong>Dispositivo:</strong> ${order.device-type}</p>
           <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
           <p><strong>Criada em:</strong> ${createdDate}</p>
           <p><strong>Última atualização:</strong> ${updatedDate}</p>
@@ -502,10 +507,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.device-Type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -665,10 +670,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -722,7 +727,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const printWindow = window.open("", "_blank")
 
         // Formatar data
-        const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+        const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
         // Traduzir status
         let statusText = ""
@@ -1000,7 +1005,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Dispositivo:</div>
-              <div class="info-value">${order.deviceType}</div>
+              <div class="info-value">${order.device-type}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Prioridade:</div>
@@ -1008,7 +1013,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             <div class="info-item full-width">
               <div class="info-label">Descrição do Problema:</div>
-              <div class="info-value">${order.problemDescription}</div>
+              <div class="info-value">${order.problem-description}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Status:</div>
@@ -1052,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               <li>O prazo para conclusão do serviço será informado após avaliação técnica.</li>
               <li>Garantia de 90 dias para os serviços realizados.</li>
               <li>Equipamentos não retirados após 30 dias serão considerados abandonados.</li>
-              <li>O cliente declara estar ciente e de acordo com os termos acima.</li>
+              <li>O e declara estar ciente e de acordo com os termos acima.</li>
             </ol>
           </div>
         </div>
@@ -1173,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       orders.forEach((order) => {
         // Formatar data
-        const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+        const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
         // Traduzir status
         let statusText = ""
@@ -1198,7 +1203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <tr>
                         <td>${order.id}</td>
                         <td>${order.clientName}</td>
-                        <td>${order.deviceType}</td>
+                        <td>${order.device-type}</td>
                         <td>${createdDate}</td>
                         <td class="status-${order.status}">${statusText}</td>
                         <td>
@@ -1324,8 +1329,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     modal.className = "modal"
 
     // Formatar datas
-    const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
-    const updatedDate = new Date(order.updatedAt).toLocaleDateString("pt-BR")
+    const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
+    const updatedDate = new Date(order.updatedat).toLocaleDateString("pt-BR")
 
     // Traduzir status
     let statusText = ""
@@ -1354,8 +1359,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div class="order-details">
                     <p><strong>Cliente:</strong> ${order.clientName}</p>
                     <p><strong>Telefone:</strong> ${order.clientPhone}</p>
-                    <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
-                    <p><strong>Problema:</strong> ${order.problemDescription}</p>
+                    <p><strong>Dispositivo:</strong> ${order.device-type}</p>
+                    <p><strong>Problema:</strong> ${order.problem-description}</p>
                     <p><strong>Prioridade:</strong> ${order.priority}</p>
                     <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
                     <p><strong>Criada em:</strong> ${createdDate}</p>
@@ -1500,10 +1505,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-Type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1605,10 +1610,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Formatar data para exibição
-      const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
+      const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1667,7 +1672,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h3>Ordem Criada</h3>
-              <p>${new Date(order.createdAt).toLocaleDateString("pt-BR")}</p>
+              <p>${new Date(order.createdat).toLocaleDateString("pt-BR")}</p>
             </div>
           </div>
       `
@@ -1701,7 +1706,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h3>Concluído</h3>
-              <p>${new Date(order.updatedAt).toLocaleDateString("pt-BR")}</p>
+              <p>${new Date(order.updatedat).toLocaleDateString("pt-BR")}</p>
             </div>
           </div>
         `
@@ -1711,7 +1716,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h3>Cancelado</h3>
-              <p>${new Date(order.updatedAt).toLocaleDateString("pt-BR")}</p>
+              <p>${new Date(order.updatedat).toLocaleDateString("pt-BR")}</p>
             </div>
           </div>
         `
@@ -1734,7 +1739,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <h3>Ordem de Serviço #${order.id}</h3>
         <p><strong>Cliente:</strong> ${order.clientName}</p>
         <p><strong>Telefone:</strong> ${order.clientPhone}</p>
-        <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
+        <p><strong>Dispositivo:</strong> ${order.device-type}</p>
         ${timelineHTML}
         <div class="share-buttons">
           <button id="share-whatsapp" class="whatsapp-share-btn">
@@ -1781,17 +1786,17 @@ Olá ${order.clientName},
 
 Aqui está o status atual do seu serviço:
 
-📱 *Dispositivo:* ${order.deviceType}
+📱 *Dispositivo:* ${order.device-Type}
 🔧 *Status:* ${statusText}
-📅 *Data de criação:* ${new Date(order.createdAt).toLocaleDateString("pt-BR")}
-${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedAt).toLocaleDateString("pt-BR")}` : ""}
+📅 *Data de criação:* ${new Date(order.createdat).toLocaleDateString("pt-BR")}
+${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedat).toLocaleDateString("pt-BR")}` : ""}
 
 Agradecemos a preferência!
 `
 
             // Criar URL do WhatsApp com o número do cliente e a mensagem
             // Remover caracteres não numéricos do telefone
-            const phoneNumber = order.clientPhone.replace(/\D/g, "")
+            const phoneNumber = order.clientphone.replace(/\D/g, "")
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
             // Abrir o WhatsApp
