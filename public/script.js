@@ -239,8 +239,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <input type="tel" id="clientPhone" required>
                     </div>
                     <div class="form-group">
-                        <label for="device-type">Tipo de Dispositivo:</label>
-                        <select id="device-type" required>
+                        <label for="devicetype">Tipo de Dispositivo:</label>
+                        <select id="devicetype" required>
                             <option value="">Selecione...</option>
                             <option value="notebook">Notebook</option>
                             <option value="desktop">Desktop</option>
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const newOrder = {
         clientname: document.getElementById("clientName").value,
         clientphone: document.getElementById("clientPhone").value,
-        devicetype: document.getElementById("device-type").value,
+        devicetype: document.getElementById("devicetype").value,
         problemdescription: document.getElementById("problem-description").value,
         priority: document.getElementById("service-priority").value,
       }
@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -435,7 +435,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resultDiv.innerHTML = `
           <h3>Ordem de Serviço #${order.id}</h3>
           <p><strong>Cliente:</strong> ${order.clientName}</p>
-          <p><strong>Dispositivo:</strong> ${order.device-type}</p>
+          <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
           <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
           <p><strong>Criada em:</strong> ${createdDate}</p>
           <p><strong>Última atualização:</strong> ${updatedDate}</p>
@@ -510,7 +510,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -673,7 +673,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1005,7 +1005,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Dispositivo:</div>
-              <div class="info-value">${order.device-type}</div>
+              <div class="info-value">${order.devicetype}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Prioridade:</div>
@@ -1359,7 +1359,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div class="order-details">
                     <p><strong>Cliente:</strong> ${order.clientName}</p>
                     <p><strong>Telefone:</strong> ${order.clientPhone}</p>
-                    <p><strong>Dispositivo:</strong> ${order.device-type}</p>
+                    <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
                     <p><strong>Problema:</strong> ${order.problem-description}</p>
                     <p><strong>Prioridade:</strong> ${order.priority}</p>
                     <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
@@ -1508,7 +1508,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1613,7 +1613,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.device-type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1739,7 +1739,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <h3>Ordem de Serviço #${order.id}</h3>
         <p><strong>Cliente:</strong> ${order.clientName}</p>
         <p><strong>Telefone:</strong> ${order.clientPhone}</p>
-        <p><strong>Dispositivo:</strong> ${order.device-type}</p>
+        <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
         ${timelineHTML}
         <div class="share-buttons">
           <button id="share-whatsapp" class="whatsapp-share-btn">
@@ -1786,7 +1786,7 @@ Olá ${order.clientName},
 
 Aqui está o status atual do seu serviço:
 
-📱 *Dispositivo:* ${order.device-type}
+📱 *Dispositivo:* ${order.devicetype}
 🔧 *Status:* ${statusText}
 📅 *Data de criação:* ${new Date(order.createdat).toLocaleDateString("pt-BR")}
 ${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedat).toLocaleDateString("pt-BR")}` : ""}
