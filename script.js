@@ -27,7 +27,7 @@ async function createServiceOrder(orderData) {
     const response = await fetch(`${API_BASE}/api/ordens`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-type": "application/json",
       },
       body: JSON.stringify(orderData),
     });
@@ -55,7 +55,7 @@ async function updateOrderStatusAPI(orderId, newStatus) {
     const response = await fetch(`${API_BASE}/api/ordens/${orderId}/status`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
+        "Content-type": "application/json",
       },
       body: JSON.stringify({ status: newStatus }),
     });
@@ -97,7 +97,7 @@ async function migrateLocalStorageToServer() {
           const response = await fetch(`${API_BASE}/api/ordens/migrate`, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-type": "application/json",
             },
             body: JSON.stringify(order),
           })
@@ -239,8 +239,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <input type="tel" id="clientPhone" required>
                     </div>
                     <div class="form-group">
-                        <label for="device-Type">Tipo de Dispositivo:</label>
-                        <select id="device-Type" required>
+                        <label for="device-type">Tipo de Dispositivo:</label>
+                        <select id="device-type" required>
                             <option value="">Selecione...</option>
                             <option value="notebook">Notebook</option>
                             <option value="desktop">Desktop</option>
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const newOrder = {
         clientname: document.getElementById("clientName").value,
         clientphone: document.getElementById("clientPhone").value,
-        devicetype: document.getElementById("device-Type").value,
+        devicetype: document.getElementById("device-type").value,
         problemdescription: document.getElementById("problem-description").value,
         priority: document.getElementById("service-priority").value,
       }
@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-Type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -510,7 +510,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.device-Type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1508,7 +1508,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-Type} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.device-type} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1786,7 +1786,7 @@ Olá ${order.clientName},
 
 Aqui está o status atual do seu serviço:
 
-📱 *Dispositivo:* ${order.device-Type}
+📱 *Dispositivo:* ${order.device-type}
 🔧 *Status:* ${statusText}
 📅 *Data de criação:* ${new Date(order.createdat).toLocaleDateString("pt-BR")}
 ${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedat).toLocaleDateString("pt-BR")}` : ""}
