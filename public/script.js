@@ -441,12 +441,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           <p><strong>Última atualização:</strong> ${updatedDate}</p>
           ${
             order.status !== "concluido" && order.status !== "cancelado"
-              ? `<div class="action-buttons">
-                  <button id="update-status-btn" class="update-status-btn" data-id="${order.id}">Atualizar Status</button>
-                </div>`
-              : ""
-          }
-        `
+        //       ? `<div class="action-buttons">
+        //           <button id="update-status-btn" class="update-status-btn" data-id="${order.id}">Atualizar Status</button>
+        //         </div>`
+        //       : ""
+        //   }
+        // `
 
         // Adicionar event listener para o botão de atualizar status
         const updateStatusBtn = document.getElementById("update-status-btn")
