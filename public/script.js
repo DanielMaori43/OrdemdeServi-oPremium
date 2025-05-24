@@ -2,15 +2,6 @@
 // URL base da sua API no Render
 const API_BASE = "https://ordemdeservi-opremium.onrender.com";
 
-// Variável global para armazenar as ordens
-let serviceOrders = [];
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js")
-      .then(() => console.log("Service Worker registrado com sucesso."))
-      .catch(err => console.error("Erro ao registrar Service Worker:", err));
-  });
-}
 // Função para carregar todas as ordens do servidor
 async function loadServiceOrders() {
   try {
@@ -1833,3 +1824,12 @@ Agradecemos a preferência!
     })
   }
 })
+// Variável global para armazenar as ordens
+let serviceOrders = [];
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(() => console.log("Service Worker registrado com sucesso."))
+      .catch(err => console.error("Erro ao registrar Service Worker:", err));
+  });
+}
