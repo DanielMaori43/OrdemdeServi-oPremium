@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000
 // Conexão com PostgreSQL no Render
 const pool = new Pool({
   connectionString:
-    "postgresql://ordens_servico_db_user:I0TFfW1JebXihjJVGMvAXHIAjcYyKdQV@dpg-d0hs9g3uibrs739nkvsg-a/ordens_servico_db",
+    "postgresql://ordens_servico_db_user:I0TFfW1JebXihjJVGMvAXHIAjcYyKdQV@dpg-d0hs9g3uibrs739nkvsg-a.oregon-postgres.render.com/ordens_servico_db",
   ssl: {
     rejectUnauthorized: false,
   },
