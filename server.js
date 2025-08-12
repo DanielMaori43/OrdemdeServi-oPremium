@@ -6,9 +6,9 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Conexão com PostgreSQL no Render
+// Pool usando variável de ambiente DATABASE_URL do Render
 const pool = new Pool({
-  connectionString: "postgresql://ordens_servico_db_user:I0TFfW1JebXihjJVGMvAXHIAjcYyKdQV@dpg-d0hs9g3uibrs739nkvsg-a.oregon-postgres.render.com/ordens_servico_db",
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
@@ -16,8 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Criar tabela se não existir
-const createTable = async () => {
+// Função para criar tabela com retry simples
+const createTable = async (tentativas = 3) => {
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS ordens_servico (
@@ -34,9 +34,17 @@ const createTable = async () => {
     `);
     console.log("Tabela verificada/criada com sucesso");
   } catch (err) {
-    console.error("Erro ao criar tabela:", err);
+    console.error("Erro ao criar tabela:", err.message);
+    if (tentativas > 0) {
+      console.log(`Tentando criar tabela novamente (${tentativas} tentativas restantes)...`);
+      setTimeout(() => createTable(tentativas - 1), 3000);
+    } else {
+      console.error("Falha ao criar tabela após várias tentativas.");
+      process.exit(1); // encerra a aplicação para evitar inconsistência
+    }
   }
 };
+
 createTable();
 
 // Rotas
