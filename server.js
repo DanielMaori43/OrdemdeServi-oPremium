@@ -203,20 +203,7 @@ const result = await pool.query(
     body.priority,
     body.status || "pendente",
   ]
-  } catch (err) {
-    console.error("\n❌ ERRO DETALHADO:")
-    console.error("Mensagem:", err.message)
-    console.error("Código:", err.code)
-    console.error("Stack:", err.stack)
-
-    res.status(500).json({
-      error: "Erro ao criar ordem de serviço",
-      details: err.message,
-      code: err.code,
-      timestamp: new Date().toISOString(),
-    })
-  }
-})
+ 
 
 // PUT atualizar status
 app.put("/api/ordens/:id/status", async (req, res) => {
