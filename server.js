@@ -210,7 +210,7 @@ const result = await pool.query(
     priority,
     status || "pendente",
   ]
-);
+
   } catch (err) {
     console.error("\n❌ ERRO DETALHADO:")
     console.error("Mensagem:", err.message)
