@@ -287,19 +287,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault()
 
-     console.log(document.getElementById("clientname"));
-console.log(document.getElementById("clientphone"));
-console.log(document.getElementById("devicetype"));
-console.log(document.getElementById("problemdescription"));
-console.log(document.getElementById("service-priority"));
-
+ 
       // Criar nova ordem de serviço
       const newOrder = {
-        clientname: document.getElementById("clientname").value,
-        clientphone: document.getElementById("clientphone").value,
-        devicetype: document.getElementById("devicetype").value,
-        problemdescription: document.getElementById("problemdescription").value,
-        priority: document.getElementById("service-priority").value,
+       console.log("clientname", document.getElementById("clientname"));
+console.log("clientphone", document.getElementById("clientphone"));
+console.log("devicetype", document.getElementById("devicetype"));
+console.log("problemdescription", document.getElementById("problemdescription"));
+console.log("service-priority", document.getElementById("service-priority"));
       }
       
 
