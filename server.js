@@ -11,7 +11,6 @@ console.log("=== INICIANDO SERVIDOR ===")
 console.log("NODE_ENV:", process.env.NODE_ENV)
 console.log("PORT:", PORT)
 
-const { Pool } = require("pg");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
