@@ -289,12 +289,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
  
       // Criar nova ordem de serviço
-      const newOrder = {
-       console.log("clientname", document.getElementById("clientname"));
+ console.log("clientname", document.getElementById("clientname"));
 console.log("clientphone", document.getElementById("clientphone"));
 console.log("devicetype", document.getElementById("devicetype"));
 console.log("problemdescription", document.getElementById("problemdescription"));
 console.log("service-priority", document.getElementById("service-priority"));
+
+const newOrder = {
+  clientname: document.getElementById("clientname").value,
+  clientphone: document.getElementById("clientphone").value,
+  devicetype: document.getElementById("devicetype").value,
+  problemdescription: document.getElementById("problemdescription").value,
+  priority: document.getElementById("service-priority").value,
       }
       
 
