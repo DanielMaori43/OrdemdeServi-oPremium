@@ -188,21 +188,29 @@ app.post("/api/ordens", async (req, res) => {
       })
     }
 
-    const now = new Date()
-    console.log("📝 Inserindo ordem no banco...")
+   const {
+  clientname,
+  clientphone,
+  devicetype,
+  problemdescription,
+  priority,
+  status
+} = req.body;
 
-    const result = await pool.query(
-      `INSERT INTO ordens_servico (clientname, clientphone, devicetype, problemdescription, priority, status, createdat, updatedat)
-       VALUES ($1, $2, $3, $4, $5, 'pendente', $6, $6) RETURNING id, clientname, status`,
-      [clientName, clientPhone, deviceType, problemDescription, priority, now],
-    )
-
-    console.log("✅ Ordem criada:", result.rows[0])
-    res.status(201).json({
-      id: result.rows[0].id,
-      message: "Ordem de serviço criada com sucesso",
-      order: result.rows[0],
-    })
+const result = await pool.query(
+  `INSERT INTO ordens_servico 
+  (clientname, clientphone, devicetype, problemdescription, priority, status)
+  VALUES ($1, $2, $3, $4, $5, $6)
+  RETURNING *`,
+  [
+    clientname,
+    clientphone,
+    devicetype,
+    problemdescription,
+    priority,
+    status || "pendente",
+  ]
+);
   } catch (err) {
     console.error("\n❌ ERRO DETALHADO:")
     console.error("Mensagem:", err.message)
