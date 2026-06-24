@@ -188,14 +188,7 @@ app.post("/api/ordens", async (req, res) => {
       })
     }
 
-   const {
-  clientname,
-  clientphone,
-  devicetype,
-  problemdescription,
-  priority,
-  status
-} = req.body;
+const body = req.body;
 
 const result = await pool.query(
   `INSERT INTO ordens_servico 
@@ -203,14 +196,13 @@ const result = await pool.query(
   VALUES ($1, $2, $3, $4, $5, $6)
   RETURNING *`,
   [
-    clientname,
-    clientphone,
-    devicetype,
-    problemdescription,
-    priority,
-    status || "pendente",
+    body.clientname,
+    body.clientphone,
+    body.devicetype,
+    body.problemdescription,
+    body.priority,
+    body.status || "pendente",
   ]
-
   } catch (err) {
     console.error("\n❌ ERRO DETALHADO:")
     console.error("Mensagem:", err.message)
