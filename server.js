@@ -12,11 +12,11 @@ console.log("NODE_ENV:", process.env.NODE_ENV)
 console.log("PORT:", PORT)
 
 const pool = new Pool({
-  connectionString:
-    "postgresql://ordens_servico_db_user:I0TFfW1JebXihjJVGMvAXHIAjcYyKdQV@dpg-d0hs9g3uibrs739nkvsg-a.oregon-postgres.render.com/ordens_servico_db",
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
+});
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
