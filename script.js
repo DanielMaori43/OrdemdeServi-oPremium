@@ -227,16 +227,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <h2>Nova Ordem de Serviço</h2>
                 <form id="service-order-form">
                     <div class="form-group">
-                        <label for="client-name">Nome do Cliente:</label>
-                         <input type="text" id="client-name" required>
+                        <label for="clientname">Nome do Cliente:</label>
+                         <input type="text" id="clientname" required>
                     </div>
                     <div class="form-group">
                         <label for="client-phone">Telefone:</label>
-                        <input type="tel" id="client-phone" required>
+                        <input type="tel" id="clientphone" required>
                     </div>
                     <div class="form-group">
-                        <label for="device-type">Tipo de Dispositivo:</label>
-                        <select id="device-type" required>
+                        <label for="devicetype">Tipo de Dispositivo:</label>
+                        <select id="devicetype" required>
                             <option value="">Selecione...</option>
                             <option value="notebook">Notebook</option>
                             <option value="desktop">Desktop</option>
@@ -246,12 +246,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="problem-description">Descrição do Problema:</label>
-                        <textarea id="problem-description" rows="4" required></textarea>
+                        <label for="problemdescription">Descrição do Problema:</label>
+                        <textarea id="problemdescription" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="service-priority">Prioridade:</label>
-                        <select id="service-priority" required>
+                        <label for="servicepriority">Prioridade:</label>
+                        <select id="servicepriority" required>
                             <option value="baixa">Baixa</option>
                             <option value="media" selected>Média</option>
                             <option value="alta">Alta</option>
@@ -288,11 +288,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Criar nova ordem de serviço
       const newOrder = {
-        clientName: document.getElementById("client-name").value,
-        clientPhone: document.getElementById("client-phone").value,
-        deviceType: document.getElementById("device-type").value,
-        problemDescription: document.getElementById("problem-description").value,
-        priority: document.getElementById("service-priority").value,
+        clientName: document.getElementById("clientname").value,
+        clientPhone: document.getElementById("clientphone").value,
+        deviceType: document.getElementById("devicetype").value,
+        problemDescription: document.getElementById("problemdescription").value,
+        priority: document.getElementById("servicepriority").value,
       }
 
       try {
