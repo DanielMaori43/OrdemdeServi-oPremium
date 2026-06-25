@@ -288,7 +288,7 @@ app.post("/api/ordens/migrate", async (req, res) => {
         createdat,
         updatedat,
       ],
-    )
+    );
 
     console.log(`✅ Ordem migrada, ID: ${result.rows[0].id}`)
     res.json({
