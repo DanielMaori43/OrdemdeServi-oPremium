@@ -19,48 +19,45 @@
         
         <!-- Grade de opções de ordem de serviço -->
         <div class="options-grid">
-            <!-- Linha 1 -->
-            <!-- <div class="option-item">
-                <i class="fas fa-clipboard-list"></i>
-                <p>Nova Ordem de Serviço</p>
-            </div> -->
-            <div class="option-item">
+
+            <div class="option-item" onclick="handleOptionClick('Status da ordem de serviço')">
                 <i class="fas fa-spinner"></i>
                 <p>Status da ordem de serviço</p>
             </div>
             
-            <!-- Linha 2 -->
-            <div class="option-item">
+            <div class="option-item" onclick="handleOptionClick('Imprimir')">
                 <i class="fas fa-print"></i>
                 <p>Imprimir</p>
             </div>
-            <div class="option-item">
+
+            <div class="option-item" onclick="handleOptionClick('Cancelar última ordem de serviço')">
                 <i class="fas fa-ban"></i>
                 <p>Cancelar última ordem de serviço</p>
             </div>
             
-            <!-- Linha 3 -->
-            <div class="option-item">
+            <div class="option-item" onclick="handleOptionClick('Pesquisar Pendentes')">
                 <i class="fas fa-search"></i>
                 <p>Pesquisar Pendentes</p>
             </div>
-            <div class="option-item">
+
+            <div class="option-item" onclick="handleOptionClick('Pesquisar Finalizados')">
                 <i class="fas fa-search-plus"></i>
                 <p>Pesquisar Finalizados</p>
             </div>
             
-            <!-- Linha 4 -->
-            <div class="option-item">
+            <div class="option-item" onclick="handleOptionClick('Finalizar ordem')">
                 <i class="fas fa-check-circle"></i>
                 <p>Finalizar ordem</p>
             </div>
-            <div class="option-item">
+
+            <div class="option-item" onclick="handleOptionClick('Rastreio')">
                 <i class="fas fa-truck"></i>
                 <p>Rastreio</p>
             </div>
+
         </div>
         
-        <!-- Rodapé com informações da empresa e botão do WhatsApp -->
+        <!-- Rodapé -->
         <footer class="footer">
             <div class="company-info">
                 <p>Transformando Tecnologia em Soluções Inovadoras.</p>
