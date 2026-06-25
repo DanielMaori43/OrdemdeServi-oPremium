@@ -341,4 +341,4 @@ process.on("SIGTERM", async () => {
     console.error("❌ Erro ao fechar pool:", err)
   }
   process.exit(0)
-})
+});
