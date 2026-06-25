@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                          <input type="text" id="clientname" required>
                     </div>
                     <div class="form-group">
-                        <label for="client-phone">Telefone:</label>
+                        <label for="clientphone">Telefone:</label>
                         <input type="tel" id="clientphone" required>
                     </div>
                     <div class="form-group">
