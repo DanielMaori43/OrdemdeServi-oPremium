@@ -272,8 +272,8 @@ function handleOptionClick(option) {
 
       // Criar nova ordem de serviço
       const newOrder = {
-        clientName: document.getElementById("clientname").value,
-        clientPhone: document.getElementById("clientphone").value,
+        clientname: document.getElementById("clientname").value,
+        clientphone: document.getElementById("clientphone").value,
         deviceType: document.getElementById("devicetype").value,
         problemDescription: document.getElementById("problemdescription").value,
         priority: document.getElementById("servicepriority").value,
@@ -335,7 +335,7 @@ function handleOptionClick(option) {
       const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.deviceType} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -413,7 +413,7 @@ function handleOptionClick(option) {
         // Mostrar resultado com botão para atualizar status
         resultDiv.innerHTML = `
         <h3>Ordem de Serviço #${order.id}</h3>
-       <p><strong>Cliente:</strong> ${order.clientName}</p>
+       <p><strong>cliente:</strong> ${order.clientname}</p>
         <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
         <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
         <p><strong>Criada em:</strong> ${createdDate}</p>
@@ -493,7 +493,7 @@ function handleOptionClick(option) {
       const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}" ${specificOrderId === order.id ? "selected" : ""}>OS #${order.id} - ${order.clientname} - ${order.deviceType} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -656,7 +656,7 @@ function handleOptionClick(option) {
       const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.deviceType} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -970,15 +970,15 @@ function handleOptionClick(option) {
       
       <div class="content">
         <div class="section">
-          <div class="section-title">Dados do Cliente</div>
+          <div class="section-title">Dados do cliente</div>
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Nome:</div>
-              <div class="info-value">${order.clientName}</div>
+              <div class="info-value">${order.clientname}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Telefone:</div>
-              <div class="info-value">${order.clientPhone}</div>
+              <div class="info-value">${order.clientphone}</div>
             </div>
           </div>
         </div>
@@ -1100,7 +1100,7 @@ function handleOptionClick(option) {
     }
 
     // Confirmar cancelamento
-    if (confirm(`Deseja realmente cancelar a Ordem de Serviço #${lastOrder.id} para ${lastOrder.clientName}?`)) {
+    if (confirm(`Deseja realmente cancelar a Ordem de Serviço #${lastOrder.id} para ${lastOrder.clientname}?`)) {
       try {
         // Atualizar status no servidor
         await updateOrderStatusAPI(lastOrder.id, "cancelado")
@@ -1185,8 +1185,8 @@ function handleOptionClick(option) {
         ordersHTML += `
                     <tr>
                         <td>${order.id}</td>
-                        <td>${order.clientName}</td>
-                        <td>${order.deviceType}</td>
+                        <td>${order.clientname}</td>
+                        <td>${order.devicetype}</td>
                         <td>${createdDate}</td>
                         <td class="status-${order.status}">${statusText}</td>
                         <td>
@@ -1340,10 +1340,10 @@ function handleOptionClick(option) {
                 <span class="close-button">&times;</span>
                 <h2>Detalhes da Ordem #${order.id}</h2>
                 <div class="order-details">
-                    <p><strong>Cliente:</strong> ${order.clientName}</p>
-                    <p><strong>Telefone:</strong> ${order.clientPhone}</p>
-                    <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
-                    <p><strong>Problema:</strong> ${order.problemDescription}</p>
+                    <p><strong>Cliente:</strong> ${order.clientname}</p>
+                    <p><strong>Telefone:</strong> ${order.clientphone}</p>
+                    <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
+                    <p><strong>Problema:</strong> ${order.problemdescription}</p>
                     <p><strong>Prioridade:</strong> ${order.priority}</p>
                     <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
                     <p><strong>Criada em:</strong> ${createdDate}</p>
@@ -1491,7 +1491,7 @@ function handleOptionClick(option) {
       const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.deviceType} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1596,7 +1596,7 @@ function handleOptionClick(option) {
       const createdDate = new Date(order.createdAt).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.deviceType} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1720,9 +1720,9 @@ function handleOptionClick(option) {
         // Mostrar resultado
         resultDiv.innerHTML = `
         <h3>Ordem de Serviço #${order.id}</h3>
-        <p><strong>Cliente:</strong> ${order.clientName}</p>
-        <p><strong>Telefone:</strong> ${order.clientPhone}</p>
-        <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
+        <p><strong>Cliente:</strong> ${order.clientname}</p>
+        <p><strong>Telefone:</strong> ${order.clientphone}</p>
+        <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
         ${timelineHTML}
         <div class="share-buttons">
           <button id="share-whatsapp" class="whatsapp-share-btn">
@@ -1765,7 +1765,7 @@ function handleOptionClick(option) {
             const message = `
 *Atualização da Ordem de Serviço #${order.id}*
 
-Olá ${order.clientName},
+Olá ${order.clientname},
 
 Aqui está o status atual do seu serviço:
 
@@ -1779,7 +1779,7 @@ Agradecemos a preferência!
 
             // Criar URL do WhatsApp com o número do cliente e a mensagem
             // Remover caracteres não numéricos do telefone
-            const phoneNumber = order.clientPhone.replace(/\D/g, "")
+            const phoneNumber = order.clientphone.replace(/\D/g, "")
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
             // Abrir o WhatsApp
