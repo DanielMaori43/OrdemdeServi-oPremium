@@ -162,7 +162,10 @@ app.post("/api/ordens", async (req, res) => {
     const clientPhone = req.body.clientPhone || req.body.clientphone || req.body["client-phone"]
     const deviceType = req.body.deviceType || req.body.devicetype || req.body["device-type"]
     const problemDescription =
-      req.body.problemDescription || req.body.problemdescription || req.body["problem-description"]
+      req.body.problemDescription ||
+      req.body.problemdescription ||
+      req.body["problem-description"]
+
     const priority = req.body.priority || req.body["service-priority"]
 
     console.log("Campos extraídos:")
@@ -173,6 +176,7 @@ app.post("/api/ordens", async (req, res) => {
     console.log("- priority:", priority)
 
     const missingFields = []
+
     if (!clientName) missingFields.push("clientName")
     if (!clientPhone) missingFields.push("clientPhone")
     if (!deviceType) missingFields.push("deviceType")
@@ -181,6 +185,7 @@ app.post("/api/ordens", async (req, res) => {
 
     if (missingFields.length > 0) {
       console.error("❌ Campos ausentes:", missingFields)
+
       return res.status(400).json({
         error: "Campos obrigatórios ausentes",
         missingFields,
@@ -188,24 +193,38 @@ app.post("/api/ordens", async (req, res) => {
       })
     }
 
-const body = req.body;
+    const result = await pool.query(
+      `
+      INSERT INTO ordens_servico
+      (clientname, clientphone, devicetype, problemdescription, priority, status)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+      `,
+      [
+        clientName,
+        clientPhone,
+        deviceType,
+        problemDescription,
+        priority,
+        req.body.status || "pendente",
+      ]
+    )
 
-const result = await pool.query(
-  `INSERT INTO ordens_servico 
-  (clientname, clientphone, devicetype, problemdescription, priority, status)
-  VALUES ($1, $2, $3, $4, $5, $6)
-  RETURNING *`,
-  [
-    body.clientname,
-    body.clientphone,
-    body.devicetype,
-    body.problemdescription,
-    body.priority,
-    body.status || "pendente",
-  ]
-);
- 
+    console.log("✅ Ordem criada:", result.rows[0])
 
+    res.status(201).json({
+      message: "Ordem criada com sucesso",
+      order: result.rows[0],
+    })
+  } catch (err) {
+    console.error("❌ Erro ao criar ordem:", err)
+
+    res.status(500).json({
+      error: "Erro ao criar ordem",
+      details: err.message,
+    })
+  }
+})
 // PUT atualizar status
 app.put("/api/ordens/:id/status", async (req, res) => {
   try {
