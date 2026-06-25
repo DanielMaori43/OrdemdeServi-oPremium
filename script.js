@@ -157,62 +157,46 @@ document.addEventListener("DOMContentLoaded", async () => {
   })
 
   // Function to handle specific option clicks
-  function handleOptionClick(option) {
-    console.log(`Opção selecionada: ${option}`)
+function handleOptionClick(option) {
+  console.log(`Opção selecionada: ${option}`);
 
-    switch (option) {
-      case "Nova Ordem de Serviço":
-        // Code to handle new service order
-        console.log("Criando nova ordem de serviço...")
-        showNewServiceOrderForm()
-        break
+  switch (option) {
+    case "Nova Ordem de Serviço":
+      showNewServiceOrderForm?.();
+      break;
 
-      case "Status da ordem de serviço":
-        // Code to check service order status
-        console.log("Verificando status da ordem de serviço...")
-        checkServiceOrderStatus()
-        break
+    case "Status da ordem de serviço":
+      checkServiceOrderStatus?.();
+      break;
 
-      case "Imprimir":
-        // Code to handle printing
-        console.log("Preparando para imprimir...")
-        printServiceOrder()
-        break
+    case "Imprimir":
+      printServiceOrder?.();
+      break;
 
-      case "Cancelar última ordem de serviço":
-        // Code to cancel last service order
-        console.log("Cancelando última ordem de serviço...")
-        cancelLastServiceOrder()
-        break
+    case "Cancelar última ordem de serviço":
+      cancelLastServiceOrder?.();
+      break;
 
-      case "Pesquisar Pendentes":
-        // Code to search pending orders
-        console.log("Pesquisando ordens pendentes...")
-        searchPendingOrders()
-        break
+    case "Pesquisar Pendentes":
+      searchPendingOrders?.();
+      break;
 
-      case "Pesquisar Finalizados":
-        // Code to search completed orders
-        console.log("Pesquisando ordens finalizadas...")
-        searchCompletedOrders()
-        break
+    case "Pesquisar Finalizados":
+      searchCompletedOrders?.();
+      break;
 
-      case "Finalizar ordem":
-        // Code to finish an order
-        console.log("Finalizando ordem...")
-        finishOrder()
-        break
+    case "Finalizar ordem":
+      finishOrder?.();
+      break;
 
-      case "Rastreio":
-        // Code to track an order
-        console.log("Rastreando ordem...")
-        trackOrder()
-        break
+    case "Rastreio":
+      trackOrder?.();
+      break;
 
-      default:
-        console.log("Opção desconhecida selecionada")
-    }
+    default:
+      console.log("Opção desconhecida selecionada");
   }
+}
 
   // Função para mostrar formulário de nova ordem de serviço
   function showNewServiceOrderForm() {
