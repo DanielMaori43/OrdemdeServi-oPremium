@@ -203,6 +203,7 @@ const result = await pool.query(
     body.priority,
     body.status || "pendente",
   ]
+);
  
 
 // PUT atualizar status
