@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <form id="service-order-form">
                     <div class="form-group">
                         <label for="client-name">Nome do Cliente:</label>
-                        <input type="text" id="clientame" required>
+                         <input type="text" id="client-name" required>
                     </div>
                     <div class="form-group">
                         <label for="client-phone">Telefone:</label>
@@ -425,12 +425,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           default:
             statusText = order.status
         }
-
+   
         // Mostrar resultado com botão para atualizar status
         resultDiv.innerHTML = `
         <h3>Ordem de Serviço #${order.id}</h3>
-        <p><strong>Cliente:</strong> ${order.clientname}</p>
-        <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
+       <p><strong>Cliente:</strong> ${order.clientName}</p>
+        <p><strong>Dispositivo:</strong> ${order.deviceType}</p>
         <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
         <p><strong>Criada em:</strong> ${createdDate}</p>
         <p><strong>Última atualização:</strong> ${updatedDate}</p>
