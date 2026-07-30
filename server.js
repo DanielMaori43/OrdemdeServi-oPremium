@@ -105,7 +105,7 @@ app.get("/api/ordens", async (req, res) => {
         problemdescription,
         priority,
         status,
-        createdat AS "createdAt",
+        createdat AS "createdat",
         updatedat AS "updatedAt"
       FROM ordens_servico
       ORDER BY id DESC
@@ -150,7 +150,7 @@ app.get("/api/ordens/:id", async (req, res) => {
         problemdescription,
         priority,
         status,
-        createdat AS "createdAt",
+        createdat AS "createdat",
         updatedat AS "updatedAt"
       FROM ordens_servico
       WHERE id = $1
@@ -308,7 +308,7 @@ app.post("/api/ordens", async (req, res) => {
         problemdescription,
         priority,
         status,
-        createdat AS "createdAt",
+        createdat AS "createdat",
         updatedat AS "updatedAt"
       `,
       [
@@ -459,8 +459,8 @@ app.post("/api/ordens/migrate", async (req, res) => {
       "pendente"
 
     const createdat =
-      order.createdAt
-        ? new Date(order.createdAt)
+      order.createdat
+        ? new Date(order.createdat)
         : now
 
     const updatedat =
