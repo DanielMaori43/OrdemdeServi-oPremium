@@ -106,7 +106,7 @@ app.get("/api/ordens", async (req, res) => {
         priority,
         status,
         createdat AS "createdat",
-        updatedat AS "updatedAt"
+        updatedat AS "updatedat"
       FROM ordens_servico
       ORDER BY id DESC
     `)
@@ -151,7 +151,7 @@ app.get("/api/ordens/:id", async (req, res) => {
         priority,
         status,
         createdat AS "createdat",
-        updatedat AS "updatedAt"
+        updatedat AS "updatedat"
       FROM ordens_servico
       WHERE id = $1
       `,
@@ -309,7 +309,7 @@ app.post("/api/ordens", async (req, res) => {
         priority,
         status,
         createdat AS "createdat",
-        updatedat AS "updatedAt"
+        updatedat AS "updatedat"
       `,
       [
         clientName,
@@ -465,7 +465,7 @@ app.post("/api/ordens/migrate", async (req, res) => {
 
     const updatedat =
       order.updatedAt
-        ? new Date(order.updatedAt)
+        ? new Date(order.updatedat)
         : now
 
     // -------------------------------------------------
