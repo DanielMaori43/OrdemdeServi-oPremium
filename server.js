@@ -51,7 +51,7 @@ const createTable = async () => {
     const tableInfo = await pool.query(`
       SELECT column_name, data_type, is_nullable 
       FROM information_schema.columns 
-      WHERE tablename = 'ordens_servico'
+      WHERE table_name = 'ordens_servico'
       ORDER BY ordinal_position;
     `)
     console.log("📋 Estrutura da tabela:", tableInfo.rows)
