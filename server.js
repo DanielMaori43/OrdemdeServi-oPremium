@@ -212,13 +212,13 @@ app.post("/api/ordens", async (req, res) => {
     // NORMALIZAÇÃO DOS CAMPOS
     // -------------------------------------------------
 
-    const clientName =
-      req.body.clientName ||
+    const clientname =
+      req.body.clientname ||
       req.body.clientname ||
       req.body["client-name"]
 
     const clientPhone =
-      req.body.clientPhone ||
+      req.body.clientphone ||
       req.body.clientphone ||
       req.body["client-phone"]
 
@@ -240,10 +240,10 @@ app.post("/api/ordens", async (req, res) => {
     const status = req.body.status || "pendente"
 
     console.log("Campos extraídos:")
-    console.log("- clientName:", clientName)
-    console.log("- clientPhone:", clientPhone)
-    console.log("- deviceType:", deviceType)
-    console.log("- problemDescription:", problemDescription)
+    console.log("- clientname:", clientname)
+    console.log("- clientphone:", clientphone)
+    console.log("- devicetype:", devicetype)
+    console.log("- problemdescription:", problemdescription)
     console.log("- priority:", priority)
     console.log("- status:", status)
 
@@ -253,20 +253,20 @@ app.post("/api/ordens", async (req, res) => {
 
     const missingFields = []
 
-    if (!clientName) {
-      missingFields.push("clientName")
+    if (!clientname) {
+      missingFields.push("clientname")
     }
 
     if (!clientPhone) {
-      missingFields.push("clientPhone")
+      missingFields.push("clientphone")
     }
 
     if (!deviceType) {
-      missingFields.push("deviceType")
+      missingFields.push("devicetype")
     }
 
     if (!problemDescription) {
-      missingFields.push("problemDescription")
+      missingFields.push("problemdescription")
     }
 
     if (!priority) {
@@ -312,7 +312,7 @@ app.post("/api/ordens", async (req, res) => {
         updatedat AS "updatedat"
       `,
       [
-        clientName,
+        clientname,
         clientPhone,
         deviceType,
         problemDescription,
@@ -437,7 +437,7 @@ app.post("/api/ordens/migrate", async (req, res) => {
     // -------------------------------------------------
 
     const clientname =
-      order.clientName ||
+      order.clientname ||
       order.clientname
 
     const clientphone =
