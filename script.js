@@ -1,6 +1,61 @@
 // Variável global para armazenar as ordens de serviço
 let serviceOrders = []
+// =====================================================
+// FUNÇÕES PARA TRATAMENTO DE DATAS
+// =====================================================
 
+function parseOrderDate(value) {
+  if (!value) {
+    return null
+  }
+
+  // Já é um objeto Date
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value
+  }
+
+  const stringValue = String(value).trim()
+
+  if (!stringValue) {
+    return null
+  }
+
+  // Formato brasileiro: DD/MM/YYYY
+  const brMatch = stringValue.match(
+    /^(\d{2})\/(\d{2})\/(\d{4})$/
+  )
+
+  if (brMatch) {
+    const [, day, month, year] = brMatch
+
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    )
+
+    return Number.isNaN(date.getTime()) ? null : date
+  }
+
+  // Tenta interpretar datas ISO/PostgreSQL
+  const date = new Date(stringValue)
+
+  if (!Number.isNaN(date.getTime())) {
+    return date
+  }
+
+  return null
+}
+
+function formatOrderDate(value) {
+  const date = parseOrderDate(value)
+
+  if (!date) {
+    return "Data não disponível"
+  }
+
+  return date.toLocaleDateString("pt-BR")
+}
 // Função para carregar todas as ordens do servidor
 async function loadServiceOrders() {
   try {
@@ -389,7 +444,7 @@ function handleOptionClick(option) {
       if (order) {
         // Formatar data
         const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
-        const updatedDate = new Date(order.updatedat).toLocaleDateString("pt-BR")
+      const updatedDate = formatOrderDate(order.updatedat || order.updatedat)
 
         // Traduzir status
         let statusText = ""
@@ -996,7 +1051,7 @@ function handleOptionClick(option) {
             </div>
             <div class="info-item full-width">
               <div class="info-label">Descrição do Problema:</div>
-              <div class="info-value">${order.problemDescription}</div>
+              <div class="info-value">${order.problemdescription}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Status:</div>
