@@ -10,11 +10,7 @@ const PORT = process.env.PORT || 3000
 console.log("=== INICIANDO SERVIDOR ===")
 console.log("NODE_ENV:", process.env.NODE_ENV)
 console.log("PORT:", PORT)
-console.log("SERVER VERSION:", "ordens-servico-fixed-v3")
-
-// =====================================================
-// CONEXÃO COM POSTGRESQL
-// =====================================================
+console.log("SERVER VERSION:", "ordens-servico-fixed-v2")
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -25,10 +21,6 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 })
-
-// =====================================================
-// MIDDLEWARES
-// =====================================================
 
 app.use(cors())
 app.use(express.json())
@@ -43,11 +35,7 @@ const createTable = async () => {
     console.log("=== VERIFICANDO/CRIANDO TABELA ===")
 
     const testConnection = await pool.query("SELECT NOW()")
-
-    console.log(
-      "✅ Conexão com banco OK:",
-      testConnection.rows[0],
-    )
+    console.log("✅ Conexão com banco OK:", testConnection.rows[0])
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS ordens_servico (
@@ -77,16 +65,9 @@ const createTable = async () => {
       ORDER BY ordinal_position;
     `)
 
-    console.log(
-      "📋 Estrutura da tabela:",
-      tableInfo.rows,
-    )
+    console.log("📋 Estrutura da tabela:", tableInfo.rows)
   } catch (err) {
-    console.error(
-      "❌ ERRO ao criar/verificar tabela:",
-      err,
-    )
-
+    console.error("❌ ERRO ao criar tabela:", err)
     console.error("Stack:", err.stack)
   }
 }
@@ -98,72 +79,14 @@ createTable().catch(console.error)
 // =====================================================
 
 app.use((req, res, next) => {
-  console.log(
-    `${new Date().toISOString()} - ${req.method} ${req.url}`,
-  )
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`)
 
   if (req.method === "POST" || req.method === "PUT") {
-    console.log(
-      "Body:",
-      JSON.stringify(req.body, null, 2),
-    )
+    console.log("Body:", JSON.stringify(req.body))
   }
 
   next()
 })
-
-// =====================================================
-// FUNÇÃO AUXILIAR
-// NORMALIZAR UMA ORDEM PARA O FRONTEND
-// =====================================================
-
-function normalizeOrder(order) {
-  if (!order) {
-    return null
-  }
-
-  return {
-    id: order.id,
-
-    clientName:
-      order.clientName ??
-      order.clientname ??
-      "",
-
-    clientPhone:
-      order.clientPhone ??
-      order.clientphone ??
-      "",
-
-    deviceType:
-      order.deviceType ??
-      order.devicetype ??
-      "",
-
-    problemDescription:
-      order.problemDescription ??
-      order.problemdescription ??
-      "",
-
-    priority:
-      order.priority ??
-      "",
-
-    status:
-      order.status ??
-      "pendente",
-
-    createdAt:
-      order.createdAt ??
-      order.createdat ??
-      null,
-
-    updatedAt:
-      order.updatedAt ??
-      order.updatedat ??
-      null,
-  }
-}
 
 // =====================================================
 // GET - TODAS AS ORDENS
@@ -182,24 +105,17 @@ app.get("/api/ordens", async (req, res) => {
         problemdescription,
         priority,
         status,
-        createdat,
-        updatedat
+        createdat AS "createdat",
+        updatedat AS "updatedat"
       FROM ordens_servico
       ORDER BY id DESC
     `)
 
-    const orders = result.rows.map(normalizeOrder)
+    console.log(`✅ Encontradas ${result.rows.length} ordens`)
 
-    console.log(
-      `✅ Encontradas ${orders.length} ordens`,
-    )
-
-    res.json(orders)
+    res.json(result.rows)
   } catch (err) {
-    console.error(
-      "❌ Erro ao buscar ordens:",
-      err,
-    )
+    console.error("❌ Erro ao buscar ordens:", err)
 
     res.status(500).json({
       error: "Erro ao buscar ordens de serviço",
@@ -209,15 +125,12 @@ app.get("/api/ordens", async (req, res) => {
 })
 
 // =====================================================
-// GET - UMA ORDEM PELO ID
+// GET - UMA ORDEM POR ID
 // =====================================================
 
 app.get("/api/ordens/:id", async (req, res) => {
   try {
-    const id = Number.parseInt(
-      req.params.id,
-      10,
-    )
+    const id = Number.parseInt(req.params.id, 10)
 
     if (Number.isNaN(id)) {
       return res.status(400).json({
@@ -225,9 +138,7 @@ app.get("/api/ordens/:id", async (req, res) => {
       })
     }
 
-    console.log(
-      `🔍 Buscando ordem com ID ${id}...`,
-    )
+    console.log(`🔍 Buscando ordem com ID ${id}...`)
 
     const result = await pool.query(
       `
@@ -239,8 +150,8 @@ app.get("/api/ordens/:id", async (req, res) => {
         problemdescription,
         priority,
         status,
-        createdat,
-        updatedat
+        createdat AS "createdat",
+        updatedat AS "updatedat"
       FROM ordens_servico
       WHERE id = $1
       `,
@@ -248,24 +159,16 @@ app.get("/api/ordens/:id", async (req, res) => {
     )
 
     if (result.rows.length === 0) {
-      console.log(
-        `❌ Ordem com ID ${id} não encontrada`,
-      )
+      console.log(`❌ Ordem com ID ${id} não encontrada`)
 
       return res.status(404).json({
         error: "Ordem não encontrada",
       })
     }
 
-    const order = normalizeOrder(
-      result.rows[0],
-    )
+    console.log(`✅ Ordem com ID ${id} encontrada`)
 
-    console.log(
-      `✅ Ordem com ID ${id} encontrada`,
-    )
-
-    res.json(order)
+    res.json(result.rows[0])
   } catch (err) {
     console.error(
       `❌ Erro ao buscar ordem com ID ${req.params.id}:`,
@@ -305,72 +208,65 @@ app.post("/api/ordens", async (req, res) => {
       })
     }
 
-    // =================================================
-    // NORMALIZAR CAMPOS RECEBIDOS
-    // =================================================
+    // -------------------------------------------------
+    // NORMALIZAÇÃO DOS CAMPOS
+    // -------------------------------------------------
 
-    const clientName =
-      req.body.clientName ??
-      req.body.clientname ??
+    const clientname =
+      req.body.clientname ||
+      req.body.clientname ||
       req.body["client-name"]
 
     const clientPhone =
-      req.body.clientPhone ??
-      req.body.clientphone ??
+      req.body.clientphone ||
+      req.body.clientphone ||
       req.body["client-phone"]
 
     const deviceType =
-      req.body.deviceType ??
-      req.body.devicetype ??
+      req.body.deviceType ||
+      req.body.devicetype ||
       req.body["device-type"]
 
     const problemDescription =
-      req.body.problemDescription ??
-      req.body.problemdescription ??
+      req.body.problemDescription ||
+      req.body.problemdescription ||
       req.body["problem-description"]
 
     const priority =
-      req.body.priority ??
-      req.body.servicePriority ??
+      req.body.priority ||
+      req.body.servicePriority ||
       req.body["service-priority"]
 
-    const status =
-      req.body.status ??
-      "pendente"
+    const status = req.body.status || "pendente"
 
     console.log("Campos extraídos:")
-    console.log("- clientName:", clientName)
-    console.log("- clientPhone:", clientPhone)
-    console.log("- deviceType:", deviceType)
-    console.log(
-      "- problemDescription:",
-      problemDescription,
-    )
+    console.log("- clientname:", clientname)
+    console.log("- clientphone:", clientphone)
+    console.log("- devicetype:", devicetype)
+    console.log("- problemdescription:", problemdescription)
     console.log("- priority:", priority)
     console.log("- status:", status)
 
-    // =================================================
-    // VALIDAR CAMPOS
-    // =================================================
+    // -------------------------------------------------
+    // VERIFICAR CAMPOS OBRIGATÓRIOS
+    // -------------------------------------------------
 
     const missingFields = []
 
-    if (!clientName) {
-      missingFields.push("clientName")
+    if (!clientname) {
+      missingFields.push("clientname")
     }
 
     if (!clientPhone) {
-      missingFields.push("clientPhone")
+      missingFields.push("clientphone")
     }
 
     if (!deviceType) {
-      missingFields.push("deviceType")
+      missingFields.push("devicetype")
     }
 
     if (!problemDescription) {
-      missingFields.push(
-        "problemDescription",
-      )
+      missingFields.push("problemdescription")
     }
 
     if (!priority) {
@@ -378,36 +274,32 @@ app.post("/api/ordens", async (req, res) => {
     }
 
     if (missingFields.length > 0) {
-      console.error(
-        "❌ Campos ausentes:",
-        missingFields,
-      )
+      console.error("❌ Campos ausentes:", missingFields)
 
       return res.status(400).json({
         error: "Campos obrigatórios ausentes",
         missingFields,
-        receivedFields:
-          Object.keys(req.body),
+        receivedFields: Object.keys(req.body),
       })
     }
 
-    // =================================================
-    // INSERIR NO BANCO
-    // =================================================
+    // -------------------------------------------------
+    // INSERIR NO POSTGRESQL
+    // -------------------------------------------------
 
     const result = await pool.query(
       `
       INSERT INTO ordens_servico
-      (
-        clientname,
-        clientphone,
-        devicetype,
-        problemdescription,
-        priority,
-        status
-      )
+        (
+          clientname,
+          clientphone,
+          devicetype,
+          problemdescription,
+          priority,
+          status
+        )
       VALUES
-      ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5, $6)
       RETURNING
         id,
         clientname,
@@ -416,11 +308,11 @@ app.post("/api/ordens", async (req, res) => {
         problemdescription,
         priority,
         status,
-        createdat,
-        updatedat
+        createdat AS "createdat",
+        updatedat AS "updatedat"
       `,
       [
-        clientName,
+        clientname,
         clientPhone,
         deviceType,
         problemDescription,
@@ -429,30 +321,21 @@ app.post("/api/ordens", async (req, res) => {
       ],
     )
 
-    const createdOrder =
-      normalizeOrder(result.rows[0])
+    const createdOrder = result.rows[0]
 
-    console.log(
-      "✅ Ordem criada:",
-      createdOrder,
-    )
+    console.log("✅ Ordem criada:", createdOrder)
 
-    // =================================================
+    // -------------------------------------------------
     // RETORNO
-    // =================================================
+    // -------------------------------------------------
 
     res.status(201).json({
       message: "Ordem criada com sucesso",
-
       id: createdOrder.id,
-
       order: createdOrder,
     })
   } catch (err) {
-    console.error(
-      "❌ Erro ao criar ordem:",
-      err,
-    )
+    console.error("❌ Erro ao criar ordem:", err)
 
     res.status(500).json({
       error: "Erro ao criar ordem",
@@ -465,234 +348,178 @@ app.post("/api/ordens", async (req, res) => {
 // PUT - ATUALIZAR STATUS
 // =====================================================
 
-app.put(
-  "/api/ordens/:id/status",
-  async (req, res) => {
-    try {
-      const { status } = req.body
+app.put("/api/ordens/:id/status", async (req, res) => {
+  try {
+    const { status } = req.body
+    const id = Number.parseInt(req.params.id, 10)
 
-      const id = Number.parseInt(
-        req.params.id,
-        10,
-      )
-
-      if (Number.isNaN(id)) {
-        return res.status(400).json({
-          error: "ID inválido",
-        })
-      }
-
-      if (!status) {
-        return res.status(400).json({
-          error: "Status é obrigatório",
-        })
-      }
-
-      console.log(
-        `🔄 Atualizando status da ordem ${id} para: ${status}`,
-      )
-
-      const result = await pool.query(
-        `
-        UPDATE ordens_servico
-        SET
-          status = $1,
-          updatedat = NOW()
-        WHERE id = $2
-        RETURNING
-          id,
-          clientname,
-          clientphone,
-          devicetype,
-          problemdescription,
-          priority,
-          status,
-          createdat,
-          updatedat
-        `,
-        [
-          status,
-          id,
-        ],
-      )
-
-      if (result.rows.length === 0) {
-        console.log(
-          `❌ Ordem com ID ${id} não encontrada`,
-        )
-
-        return res.status(404).json({
-          error: "Ordem não encontrada",
-        })
-      }
-
-      const updatedOrder =
-        normalizeOrder(result.rows[0])
-
-      console.log(
-        "✅ Status atualizado:",
-        updatedOrder,
-      )
-
-      res.json({
-        message:
-          "Status atualizado com sucesso",
-
-        order: updatedOrder,
-      })
-    } catch (err) {
-      console.error(
-        "❌ Erro ao atualizar status:",
-        err,
-      )
-
-      res.status(500).json({
-        error: "Erro ao atualizar status",
-        details: err.message,
+    if (Number.isNaN(id)) {
+      return res.status(400).json({
+        error: "ID inválido",
       })
     }
-  },
-)
 
-// =====================================================
-// POST - MIGRAR LOCALSTORAGE
-// =====================================================
+    if (!status) {
+      return res.status(400).json({
+        error: "Status é obrigatório",
+      })
+    }
 
-app.post(
-  "/api/ordens/migrate",
-  async (req, res) => {
-    try {
+    console.log(
+      `🔄 Atualizando status da ordem ${id} para: ${status}`,
+    )
+
+    const now = new Date()
+
+    const result = await pool.query(
+      `
+      UPDATE ordens_servico
+      SET
+        status = $1,
+        updatedat = $2
+      WHERE id = $3
+      RETURNING id, status
+      `,
+      [status, now, id],
+    )
+
+    if (result.rows.length === 0) {
       console.log(
-        "🔄 Migrando ordem:",
-        req.body,
+        `❌ Ordem com ID ${id} não encontrada para atualização`,
       )
 
-      if (
-        !req.body ||
-        typeof req.body !== "object"
-      ) {
-        return res.status(400).json({
-          error:
-            "Dados da ordem são obrigatórios",
-        })
-      }
+      return res.status(404).json({
+        error: "Ordem não encontrada",
+      })
+    }
 
-      const order = req.body
+    console.log(
+      "✅ Status atualizado:",
+      result.rows[0],
+    )
 
-      // =================================================
-      // NORMALIZAR DADOS
-      // =================================================
+    res.json({
+      message: "Status atualizado com sucesso",
+      order: result.rows[0],
+    })
+  } catch (err) {
+    console.error("❌ Erro ao atualizar status:", err)
 
-      const clientName =
-        order.clientName ??
-        order.clientname ??
-        ""
+    res.status(500).json({
+      error: "Erro ao atualizar status",
+      details: err.message,
+    })
+  }
+})
 
-      const clientPhone =
-        order.clientPhone ??
-        order.clientphone ??
-        ""
+// =====================================================
+// POST - MIGRAR ORDENS DO LOCALSTORAGE
+// =====================================================
 
-      const deviceType =
-        order.deviceType ??
-        order.devicetype ??
-        ""
+app.post("/api/ordens/migrate", async (req, res) => {
+  try {
+    console.log("🔄 Migrando ordem:", req.body)
 
-      const problemDescription =
-        order.problemDescription ??
-        order.problemdescription ??
-        ""
+    if (
+      !req.body ||
+      typeof req.body !== "object"
+    ) {
+      return res.status(400).json({
+        error: "Dados da ordem são obrigatórios",
+      })
+    }
 
-      const priority =
-        order.priority ??
-        ""
+    const order = req.body
+    const now = new Date()
 
-      const status =
-        order.status ??
-        "pendente"
+    // -------------------------------------------------
+    // NORMALIZAÇÃO
+    // -------------------------------------------------
 
-      const createdValue =
-        order.createdAt ??
-        order.createdat
+    const clientname =
+      order.clientname ||
+      order.clientname
 
-      const updatedValue =
-        order.updatedAt ??
-        order.updatedat
+    const clientphone =
+      order.clientPhone ||
+      order.clientphone
 
-      const createdAt =
-        createdValue &&
-        !Number.isNaN(
-          new Date(createdValue).getTime(),
-        )
-          ? new Date(createdValue)
-          : new Date()
+    const devicetype =
+      order.deviceType ||
+      order.devicetype
 
-      const updatedAt =
-        updatedValue &&
-        !Number.isNaN(
-          new Date(updatedValue).getTime(),
-        )
-          ? new Date(updatedValue)
-          : new Date()
+    const problemdescription =
+      order.problemDescription ||
+      order.problemdescription
 
-      // =================================================
-      // VALIDAR
-      // =================================================
+    const priority = order.priority
 
-      const missingFields = []
+    const status =
+      order.status ||
+      "pendente"
 
-      if (!clientName) {
-        missingFields.push("clientName")
-      }
+    const createdat =
+      order.createdat
+        ? new Date(order.createdat)
+        : now
 
-      if (!clientPhone) {
-        missingFields.push("clientPhone")
-      }
+    const updatedat =
+      order.updatedAt
+        ? new Date(order.updatedat)
+        : now
 
-      if (!deviceType) {
-        missingFields.push("deviceType")
-      }
+    // -------------------------------------------------
+    // VALIDAR
+    // -------------------------------------------------
 
-      if (!problemDescription) {
-        missingFields.push(
-          "problemDescription",
-        )
-      }
+    const missingFields = []
 
-      if (!priority) {
-        missingFields.push("priority")
-      }
+    if (!clientname) {
+      missingFields.push("clientname")
+    }
 
-      if (missingFields.length > 0) {
-        return res.status(400).json({
-          error:
-            "Campos obrigatórios ausentes",
+    if (!clientphone) {
+      missingFields.push("clientphone")
+    }
 
-          missingFields,
-        })
-      }
+    if (!devicetype) {
+      missingFields.push("devicetype")
+    }
 
-      console.log(
-        "Dados normalizados para migração:",
-        {
-          clientName,
-          clientPhone,
-          deviceType,
-          problemDescription,
-          priority,
-          status,
-          createdAt,
-          updatedAt,
-        },
-      )
+    if (!problemdescription) {
+      missingFields.push("problemdescription")
+    }
 
-      // =================================================
-      // INSERIR
-      // =================================================
+    if (!priority) {
+      missingFields.push("priority")
+    }
 
-      const result = await pool.query(
-        `
-        INSERT INTO ordens_servico
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: "Campos obrigatórios ausentes",
+        missingFields,
+      })
+    }
+
+    console.log(
+      "Dados normalizados para migração:",
+      {
+        clientname,
+        clientphone,
+        devicetype,
+        problemdescription,
+        priority,
+        status,
+      },
+    )
+
+    // -------------------------------------------------
+    // INSERIR
+    // -------------------------------------------------
+
+    const result = await pool.query(
+      `
+      INSERT INTO ordens_servico
         (
           clientname,
           clientphone,
@@ -703,59 +530,39 @@ app.post(
           createdat,
           updatedat
         )
-        VALUES
+      VALUES
         ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING
-          id,
-          clientname,
-          clientphone,
-          devicetype,
-          problemdescription,
-          priority,
-          status,
-          createdat,
-          updatedat
-        `,
-        [
-          clientName,
-          clientPhone,
-          deviceType,
-          problemDescription,
-          priority,
-          status,
-          createdAt,
-          updatedAt,
-        ],
-      )
+      RETURNING id
+      `,
+      [
+        clientname,
+        clientphone,
+        devicetype,
+        problemdescription,
+        priority,
+        status,
+        createdat,
+        updatedat,
+      ],
+    )
 
-      const migratedOrder =
-        normalizeOrder(result.rows[0])
+    console.log(
+      `✅ Ordem migrada, ID: ${result.rows[0].id}`,
+    )
 
-      console.log(
-        `✅ Ordem migrada, ID: ${migratedOrder.id}`,
-      )
+    res.json({
+      message: "Ordem migrada com sucesso",
+      id: result.rows[0].id,
+    })
+  } catch (err) {
+    console.error("❌ Erro ao migrar ordem:", err)
 
-      res.json({
-        message:
-          "Ordem migrada com sucesso",
-
-        id: migratedOrder.id,
-
-        order: migratedOrder,
-      })
-    } catch (err) {
-      console.error(
-        "❌ Erro ao migrar ordem:",
-        err,
-      )
-
-      res.status(500).json({
-        error: "Erro ao migrar ordem",
-        details: err.message,
-      })
-    }
-  },
-)
+    res.status(500).json({
+      error: "Erro ao migrar ordem",
+      details: err.message,
+    })
+  }
+})
 
 // =====================================================
 // PÁGINA INICIAL
@@ -776,11 +583,9 @@ app.get("*", (req, res) => {
       indexPath,
     )
 
-    res
-      .status(404)
-      .send(
-        "Página não encontrada - index.html não existe.",
-      )
+    res.status(404).send(
+      "Página não encontrada - index.html não existe.",
+    )
   }
 })
 
@@ -803,9 +608,7 @@ app.listen(PORT, () => {
 // =====================================================
 
 process.on("SIGINT", async () => {
-  console.log(
-    "🛑 Encerrando servidor...",
-  )
+  console.log("🛑 Encerrando servidor...")
 
   try {
     await pool.end()
@@ -824,9 +627,7 @@ process.on("SIGINT", async () => {
 })
 
 process.on("SIGTERM", async () => {
-  console.log(
-    "🛑 Recebido SIGTERM...",
-  )
+  console.log("🛑 Recebido SIGTERM...")
 
   try {
     await pool.end()
