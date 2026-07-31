@@ -466,10 +466,26 @@ function handleOptionClick(option) {
         }
    
         // Mostrar resultado com botão para atualizar status
-        resultDiv.innerHTML = `
+       const cliente =
+  order.clientname ||
+  order.clientName ||
+  "Não informado"
+
+const telefone =
+  order.clientphone ||
+  order.clientPhone ||
+  "Não informado"
+
+const dispositivo =
+  order.devicetype ||
+  order.deviceType ||
+  "Não informado"
+
+resultDiv.innerHTML = `
         <h3>Ordem de Serviço #${order.id}</h3>
-       <p><strong>cliente:</strong> ${order.clientname}</p>
-        <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
+        <p><strong>Cliente:</strong> ${cliente}</p>
+        <p><strong>Telefone:</strong> ${telefone}</p>
+        <p><strong>Dispositivo:</strong> ${dispositivo}</p>
         <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
         <p><strong>Criada em:</strong> ${createdDate}</p>
         <p><strong>Última atualização:</strong> ${updatedDate}</p>
