@@ -1820,7 +1820,7 @@ function handleOptionClick(option) {
             const message = `
 *Atualização da Ordem de Serviço #${order.id}*
 
-Olá ${order.clientname},
+Olá ${order.clientname || "cliente"},
 
 Aqui está o status atual do seu serviço:
 
@@ -1834,7 +1834,7 @@ Agradecemos a preferência!
 
             // Criar URL do WhatsApp com o número do cliente e a mensagem
             // Remover caracteres não numéricos do telefone
-            const phoneNumber = order.clientphone.replace(/\D/g, "")
+            const phoneNumber = (order.clientphone || "").replace(/\D/g, "")
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
             // Abrir o WhatsApp
