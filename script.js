@@ -440,8 +440,7 @@ function handleOptionClick(option) {
 
       // Procurar a ordem pelo ID
       const order = serviceOrders.find((order) => order.id === orderId)
-      console.log("ORDEM DO RASTREIO:", order)
-
+     
       if (order) {
         // Formatar data
         const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
@@ -1726,7 +1725,9 @@ console.log("====================")
 
       // Procurar a ordem pelo ID
       const order = serviceOrders.find((order) => order.id === orderId)
-
+      console.log("ID selecionado:", orderId)
+      console.log("Todas as ordens:", serviceOrders)
+      console.log("ORDEM ENCONTRADA NO RASTREIO:", order)
       if (order) {
         // Criar timeline baseada no status
         let timelineHTML = `
