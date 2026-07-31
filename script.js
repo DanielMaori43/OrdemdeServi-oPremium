@@ -440,6 +440,7 @@ function handleOptionClick(option) {
 
       // Procurar a ordem pelo ID
       const order = serviceOrders.find((order) => order.id === orderId)
+      console.log("ORDEM DO RASTREIO:", order)
 
       if (order) {
         // Formatar data
