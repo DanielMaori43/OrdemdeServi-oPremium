@@ -432,7 +432,6 @@ function handleOptionClick(option) {
 
     // Manipular envio do formulário
     const form = modal.querySelector("#check-status-form")
-    form.addEventListener("submit", (e) => {
       form.addEventListener("submit", (e) => {
       e.preventDefault()
 
