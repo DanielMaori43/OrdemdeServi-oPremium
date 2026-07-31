@@ -1372,6 +1372,14 @@ resultDiv.innerHTML = `
   // Função para visualizar detalhes de uma ordem
   function viewOrderDetails(orderId) {
     const order = serviceOrders.find((order) => order.id === orderId)
+    console.log("===== RASTREIO =====")
+console.log("ID selecionado:", orderId)
+console.log("ORDEM ENCONTRADA:", order)
+console.log("CLIENTNAME:", order?.clientname)
+console.log("CLIENTNAME:", order?.clientName)
+console.log("CLIENTPHONE:", order?.clientphone)
+console.log("CLIENTPHONE:", order?.clientPhone)
+console.log("====================")
 
     if (!order) {
       alert(`Ordem de serviço #${orderId} não encontrada.`)
@@ -1760,7 +1768,7 @@ resultDiv.innerHTML = `
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h3>Concluído</h3>
-              <p>${new Date(order.updatedAt).toLocaleDateString("pt-BR")}</p>
+              <p>${new Date(order.updatedat).toLocaleDateString("pt-BR")}</p>
             </div>
           </div>
         `
@@ -1770,7 +1778,7 @@ resultDiv.innerHTML = `
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h3>Cancelado</h3>
-              <p>${new Date(order.updatedAt).toLocaleDateString("pt-BR")}</p>
+              <p>${new Date(order.updatedat).toLocaleDateString("pt-BR")}</p>
             </div>
           </div>
         `
@@ -1843,7 +1851,7 @@ Aqui está o status atual do seu serviço:
 📱 *Dispositivo:* ${order.devicetype}
 🔧 *Status:* ${statusText}
 📅 *Data de criação:* ${new Date(order.createdat).toLocaleDateString("pt-BR")}
-${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedAt).toLocaleDateString("pt-BR")}` : ""}
+${order.status === "concluido" ? `✅ *Concluído em:* ${new Date(order.updatedat).toLocaleDateString("pt-BR")}` : ""}
 
 Agradecemos a preferência!
 `
