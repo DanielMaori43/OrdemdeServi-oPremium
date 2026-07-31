@@ -2,7 +2,6 @@ const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,17 +10,19 @@ const PORT = process.env.PORT || 3000;
 // INFORMAÇÕES DO SERVIDOR
 // =====================================================
 
+console.log("==========================================");
 console.log("=== INICIANDO SERVIDOR ===");
+console.log("==========================================");
 console.log("NODE_ENV:", process.env.NODE_ENV);
 console.log("PORT:", PORT);
-console.log("SERVER VERSION:", "ordens-servico-fixed-v3");
+console.log("SERVER VERSION:", "ordens-servico-public-v4");
 
 // =====================================================
 // CONEXÃO COM NEON / POSTGRESQL
 // =====================================================
 
 if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL NÃO FOI CONFIGURADA NO RENDER.");
+  console.error("❌ ERRO: DATABASE_URL não foi configurada.");
 } else {
   console.log("✅ DATABASE_URL encontrada.");
 }
@@ -36,6 +37,10 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000,
 });
 
+pool.on("error", (err) => {
+  console.error("❌ Erro inesperado no PostgreSQL:", err);
+});
+
 // =====================================================
 // MIDDLEWARES
 // =====================================================
@@ -43,92 +48,61 @@ const pool = new Pool({
 app.use(cors());
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// =====================================================
-// ARQUIVOS ESTÁTICOS
-// =====================================================
-
-// -----------------------------------------------------
-// SCRIPT.JS ÚNICO
-// -----------------------------------------------------
-// O arquivo deve ficar na raiz:
-//
-// /script.js
-//
-// E será acessado pelo navegador por:
-//
-// /script.js
-// -----------------------------------------------------
-
-app.get("/script.js", (req, res) => {
-  const file = path.join(__dirname, "script.js");
-
-  if (fs.existsSync(file)) {
-    return res.sendFile(file);
-  }
-
-  console.error("❌ script.js não encontrado:", file);
-
-  return res.status(404).send("script.js não encontrado");
-});
-
-// =====================================================
-// STYLES.CSS
-// =====================================================
-
-// Caso o styles.css esteja na raiz do projeto.
-app.get("/styles.css", (req, res) => {
-  const file = path.join(__dirname, "styles.css");
-
-  if (fs.existsSync(file)) {
-    return res.sendFile(file);
-  }
-
-  // Caso esteja dentro de public.
-  const publicFile = path.join(
-    __dirname,
-    "public",
-    "styles.css"
-  );
-
-  if (fs.existsSync(publicFile)) {
-    return res.sendFile(publicFile);
-  }
-
-  return res.status(404).send("styles.css não encontrado");
-});
-
-// =====================================================
-// ARQUIVOS DENTRO DE PUBLIC
-// =====================================================
 
 app.use(
-  express.static(path.join(__dirname, "public"))
+  express.urlencoded({
+    extended: true,
+  })
 );
 
 // =====================================================
-// FUNÇÃO PARA SERVIR PÁGINAS HTML
+// ARQUIVOS PÚBLICOS
+// =====================================================
+//
+// TUDO que estiver dentro de /public poderá ser acessado
+// diretamente pelo navegador.
+//
+// Exemplo:
+//
+// public/script.js      -> /script.js
+// public/styles.css     -> /styles.css
+// public/img/logo.png   -> /img/logo.png
+//
+// =====================================================
+
+app.use(
+  express.static(
+    path.join(__dirname, "public")
+  )
+);
+
+// =====================================================
+// FUNÇÃO PARA ENVIAR PÁGINAS DE VIEWS
 // =====================================================
 
 function enviarPagina(nomeArquivo, res) {
-  const caminhosPossiveis = [
-    path.join(__dirname, "public", nomeArquivo),
-    path.join(__dirname, "views", nomeArquivo),
-  ];
-
-  for (const arquivo of caminhosPossiveis) {
-    if (fs.existsSync(arquivo)) {
-      return res.sendFile(arquivo);
-    }
-  }
-
-  console.error(
-    `❌ Página ${nomeArquivo} não encontrada.`
+  const arquivo = path.join(
+    __dirname,
+    "views",
+    nomeArquivo
   );
 
-  return res.status(404).send(
-    `Página ${nomeArquivo} não encontrada.`
+  return res.sendFile(
+    arquivo,
+    (err) => {
+      if (err) {
+        console.error(
+          `❌ Erro ao carregar ${nomeArquivo}:`,
+          err.message
+        );
+
+        if (!res.headersSent) {
+          res.status(404).send(
+            `Página ${nomeArquivo} não encontrada.`
+          );
+        }
+      }
+    }
   );
 }
 
@@ -136,34 +110,51 @@ function enviarPagina(nomeArquivo, res) {
 // PÁGINAS
 // =====================================================
 
-// Página inicial
 app.get("/", (req, res) => {
   enviarPagina("index.html", res);
 });
 
-// Index
 app.get("/index.html", (req, res) => {
   enviarPagina("index.html", res);
 });
 
-// Login
 app.get("/login.html", (req, res) => {
   enviarPagina("login.html", res);
 });
 
-// Mesa
 app.get("/mesa.html", (req, res) => {
   enviarPagina("mesa.html", res);
 });
 
-// Garçom
 app.get("/garcom.html", (req, res) => {
   enviarPagina("garcom.html", res);
 });
 
-// Caixa
 app.get("/caixa.html", (req, res) => {
   enviarPagina("caixa.html", res);
+});
+
+// =====================================================
+// LOG DAS REQUISIÇÕES
+// =====================================================
+
+app.use((req, res, next) => {
+  console.log(
+    `${new Date().toISOString()} - ${req.method} ${req.originalUrl}`
+  );
+
+  if (
+    req.method === "POST" ||
+    req.method === "PUT" ||
+    req.method === "PATCH"
+  ) {
+    console.log(
+      "Body:",
+      JSON.stringify(req.body, null, 2)
+    );
+  }
+
+  next();
 });
 
 // =====================================================
@@ -172,14 +163,23 @@ app.get("/caixa.html", (req, res) => {
 
 async function createTable() {
   try {
-    console.log("=== VERIFICANDO/CRIANDO TABELA ===");
+    console.log(
+      "=== VERIFICANDO/CRIANDO TABELA ==="
+    );
+
+    if (!process.env.DATABASE_URL) {
+      console.error(
+        "❌ DATABASE_URL não configurada."
+      );
+      return;
+    }
 
     const testConnection = await pool.query(
-      "SELECT NOW()"
+      "SELECT NOW() AS agora"
     );
 
     console.log(
-      "✅ Conexão com banco OK:",
+      "✅ Conexão com Neon OK:",
       testConnection.rows[0]
     );
 
@@ -198,12 +198,11 @@ async function createTable() {
     `);
 
     console.log(
-      "✅ Tabela verificada/criada com sucesso."
+      "✅ Tabela ordens_servico verificada/criada."
     );
 
     const tableInfo = await pool.query(`
       SELECT
-        table_name,
         column_name,
         data_type,
         is_nullable,
@@ -219,7 +218,7 @@ async function createTable() {
     );
   } catch (err) {
     console.error(
-      "❌ ERRO ao criar/verificar tabela:",
+      "❌ ERRO ao verificar/criar tabela:",
       err.message
     );
 
@@ -228,30 +227,7 @@ async function createTable() {
 }
 
 // =====================================================
-// LOG DAS REQUISIÇÕES
-// =====================================================
-
-app.use((req, res, next) => {
-  console.log(
-    `${new Date().toISOString()} - ${req.method} ${req.url}`
-  );
-
-  if (
-    req.method === "POST" ||
-    req.method === "PUT" ||
-    req.method === "PATCH"
-  ) {
-    console.log(
-      "Body:",
-      JSON.stringify(req.body)
-    );
-  }
-
-  next();
-});
-
-// =====================================================
-// API - TESTE DO BANCO
+// API - TESTE
 // =====================================================
 
 app.get("/api/test", async (req, res) => {
@@ -262,19 +238,19 @@ app.get("/api/test", async (req, res) => {
 
     res.json({
       success: true,
-      message: "Servidor e banco funcionando.",
+      message: "Servidor funcionando.",
       database: "Neon PostgreSQL",
       time: result.rows[0].agora,
     });
   } catch (err) {
     console.error(
-      "❌ Erro no teste do banco:",
+      "❌ Erro no teste:",
       err
     );
 
     res.status(500).json({
       success: false,
-      error: "Erro ao conectar com o banco.",
+      error: "Erro ao conectar ao banco.",
       details: err.message,
     });
   }
@@ -317,108 +293,96 @@ app.get("/api/ordens", async (req, res) => {
     );
 
     res.status(500).json({
-      error: "Erro ao buscar ordens de serviço.",
+      error:
+        "Erro ao buscar ordens de serviço.",
       details: err.message,
     });
   }
 });
 
 // =====================================================
-// GET - UMA ORDEM POR ID
+// GET - UMA ORDEM
 // =====================================================
 
-app.get("/api/ordens/:id", async (req, res) => {
-  try {
-    const id = Number.parseInt(
-      req.params.id,
-      10
-    );
-
-    if (Number.isNaN(id)) {
-      return res.status(400).json({
-        error: "ID inválido.",
-      });
-    }
-
-    console.log(
-      `🔍 Buscando ordem com ID ${id}...`
-    );
-
-    const result = await pool.query(
-      `
-      SELECT
-        id,
-        clientname,
-        clientphone,
-        devicetype,
-        problemdescription,
-        priority,
-        status,
-        createdat,
-        updatedat
-      FROM ordens_servico
-      WHERE id = $1
-      `,
-      [id]
-    );
-
-    if (result.rows.length === 0) {
-      console.log(
-        `❌ Ordem com ID ${id} não encontrada.`
+app.get(
+  "/api/ordens/:id",
+  async (req, res) => {
+    try {
+      const id = Number.parseInt(
+        req.params.id,
+        10
       );
 
-      return res.status(404).json({
-        error: "Ordem não encontrada.",
+      if (Number.isNaN(id)) {
+        return res.status(400).json({
+          error: "ID inválido.",
+        });
+      }
+
+      const result = await pool.query(
+        `
+        SELECT
+          id,
+          clientname,
+          clientphone,
+          devicetype,
+          problemdescription,
+          priority,
+          status,
+          createdat,
+          updatedat
+        FROM ordens_servico
+        WHERE id = $1
+        `,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error:
+            "Ordem não encontrada.",
+        });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error(
+        "❌ Erro ao buscar ordem:",
+        err
+      );
+
+      res.status(500).json({
+        error:
+          "Erro ao buscar ordem.",
+        details: err.message,
       });
     }
-
-    console.log(
-      `✅ Ordem com ID ${id} encontrada.`
-    );
-
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(
-      `❌ Erro ao buscar ordem ${req.params.id}:`,
-      err
-    );
-
-    res.status(500).json({
-      error: "Erro ao buscar ordem.",
-      details: err.message,
-    });
   }
-});
+);
 
 // =====================================================
-// POST - NOVA ORDEM
+// POST - CRIAR ORDEM
 // =====================================================
 
 app.post("/api/ordens", async (req, res) => {
   try {
-    console.log("\n=== NOVA ORDEM ===");
-
     console.log(
-      "Body recebido:",
-      JSON.stringify(req.body, null, 2)
+      "=== CRIANDO NOVA ORDEM ==="
     );
 
     if (
       !req.body ||
-      typeof req.body !== "object" ||
-      Object.keys(req.body).length === 0
+      typeof req.body !== "object"
     ) {
-      console.error("❌ Body vazio.");
-
       return res.status(400).json({
-        error: "Dados não recebidos.",
-        receivedBody: req.body,
+        error:
+          "Dados da ordem não recebidos.",
       });
     }
 
-    // =================================================
-    // NORMALIZAÇÃO DOS CAMPOS
-    // =================================================
+    // -------------------------------------------------
+    // ACEITAR VÁRIOS NOMES DE CAMPOS
+    // -------------------------------------------------
 
     const clientname =
       req.body.clientName ??
@@ -454,59 +418,68 @@ app.post("/api/ordens", async (req, res) => {
       req.body.status ??
       "pendente";
 
-    console.log("Campos extraídos:");
-    console.log("- clientname:", clientname);
-    console.log("- clientphone:", clientphone);
-    console.log("- devicetype:", devicetype);
-    console.log(
-      "- problemdescription:",
-      problemdescription
-    );
-    console.log("- priority:", priority);
-    console.log("- status:", status);
+    console.log({
+      clientname,
+      clientphone,
+      devicetype,
+      problemdescription,
+      priority,
+      status,
+    });
 
-    // =================================================
-    // VERIFICAR CAMPOS OBRIGATÓRIOS
-    // =================================================
+    // -------------------------------------------------
+    // VALIDAR
+    // -------------------------------------------------
 
     const missingFields = [];
 
     if (!String(clientname).trim()) {
-      missingFields.push("clientname");
+      missingFields.push(
+        "clientname"
+      );
     }
 
     if (!String(clientphone).trim()) {
-      missingFields.push("clientphone");
+      missingFields.push(
+        "clientphone"
+      );
     }
 
     if (!String(devicetype).trim()) {
-      missingFields.push("devicetype");
+      missingFields.push(
+        "devicetype"
+      );
     }
 
-    if (!String(problemdescription).trim()) {
-      missingFields.push("problemdescription");
+    if (
+      !String(
+        problemdescription
+      ).trim()
+    ) {
+      missingFields.push(
+        "problemdescription"
+      );
     }
 
     if (!String(priority).trim()) {
-      missingFields.push("priority");
+      missingFields.push(
+        "priority"
+      );
     }
 
     if (missingFields.length > 0) {
-      console.error(
-        "❌ Campos ausentes:",
-        missingFields
-      );
-
       return res.status(400).json({
-        error: "Campos obrigatórios ausentes.",
+        error:
+          "Campos obrigatórios ausentes.",
         missingFields,
-        receivedFields: Object.keys(req.body),
+        receivedFields:
+          Object.keys(req.body),
       });
     }
 
-    // =================================================
-    // INSERIR NO POSTGRESQL
-    // =================================================
+    // -------------------------------------------------
+    // INSERIR
+    // -------------------------------------------------
 
     const result = await pool.query(
       `
@@ -536,24 +509,27 @@ app.post("/api/ordens", async (req, res) => {
         String(clientname).trim(),
         String(clientphone).trim(),
         String(devicetype).trim(),
-        String(problemdescription).trim(),
+        String(
+          problemdescription
+        ).trim(),
         String(priority).trim(),
         String(status).trim(),
       ]
     );
 
-    const createdOrder =
+    const order =
       result.rows[0];
 
     console.log(
       "✅ Ordem criada:",
-      createdOrder
+      order
     );
 
     res.status(201).json({
-      message: "Ordem criada com sucesso.",
-      id: createdOrder.id,
-      order: createdOrder,
+      message:
+        "Ordem criada com sucesso.",
+      id: order.id,
+      order,
     });
   } catch (err) {
     console.error(
@@ -562,7 +538,8 @@ app.post("/api/ordens", async (req, res) => {
     );
 
     res.status(500).json({
-      error: "Erro ao criar ordem.",
+      error:
+        "Erro ao criar ordem.",
       details: err.message,
     });
   }
@@ -576,16 +553,19 @@ app.put(
   "/api/ordens/:id/status",
   async (req, res) => {
     try {
-      const { status } = req.body;
+      const id =
+        Number.parseInt(
+          req.params.id,
+          10
+        );
 
-      const id = Number.parseInt(
-        req.params.id,
-        10
-      );
+      const status =
+        req.body?.status;
 
       if (Number.isNaN(id)) {
         return res.status(400).json({
-          error: "ID inválido.",
+          error:
+            "ID inválido.",
         });
       }
 
@@ -595,36 +575,36 @@ app.put(
         String(status).trim() === ""
       ) {
         return res.status(400).json({
-          error: "Status é obrigatório.",
+          error:
+            "Status é obrigatório.",
         });
       }
 
-      console.log(
-        `🔄 Atualizando status da ordem ${id} para: ${status}`
-      );
-
-      const result = await pool.query(
-        `
-        UPDATE ordens_servico
-        SET
-          status = $1,
-          updatedat = NOW()
-        WHERE id = $2
-        RETURNING
-          id,
-          status,
-          updatedat
-        `,
-        [String(status).trim(), id]
-      );
-
-      if (result.rows.length === 0) {
-        console.log(
-          `❌ Ordem ${id} não encontrada.`
+      const result =
+        await pool.query(
+          `
+          UPDATE ordens_servico
+          SET
+            status = $1,
+            updatedat = NOW()
+          WHERE id = $2
+          RETURNING
+            id,
+            status,
+            updatedat
+          `,
+          [
+            String(status).trim(),
+            id,
+          ]
         );
 
+      if (
+        result.rows.length === 0
+      ) {
         return res.status(404).json({
-          error: "Ordem não encontrada.",
+          error:
+            "Ordem não encontrada.",
         });
       }
 
@@ -636,7 +616,8 @@ app.put(
       res.json({
         message:
           "Status atualizado com sucesso.",
-        order: result.rows[0],
+        order:
+          result.rows[0],
       });
     } catch (err) {
       console.error(
@@ -654,7 +635,7 @@ app.put(
 );
 
 // =====================================================
-// POST - MIGRAR ORDEM DO LOCALSTORAGE
+// POST - MIGRAR ORDEM
 // =====================================================
 
 app.post(
@@ -662,8 +643,7 @@ app.post(
   async (req, res) => {
     try {
       console.log(
-        "🔄 Migrando ordem:",
-        JSON.stringify(req.body, null, 2)
+        "🔄 Migrando ordem..."
       );
 
       if (
@@ -676,13 +656,8 @@ app.post(
         });
       }
 
-      const order = req.body;
-
-      const now = new Date();
-
-      // =================================================
-      // NORMALIZAÇÃO
-      // =================================================
+      const order =
+        req.body;
 
       const clientname =
         order.clientName ??
@@ -718,55 +693,68 @@ app.post(
         order.status ??
         "pendente";
 
-      let createdat = now;
+      let createdat =
+        new Date();
+
+      let updatedat =
+        new Date();
 
       if (order.createdat) {
-        const dataCriacao = new Date(
-          order.createdat
-        );
+        const date =
+          new Date(
+            order.createdat
+          );
 
-        if (!Number.isNaN(dataCriacao.getTime())) {
-          createdat = dataCriacao;
+        if (
+          !Number.isNaN(
+            date.getTime()
+          )
+        ) {
+          createdat = date;
         }
       }
-
-      let updatedat = now;
 
       if (
         order.updatedat ||
         order.updatedAt
       ) {
-        const dataAtualizacao =
+        const date =
           new Date(
             order.updatedat ??
-            order.updatedAt
+              order.updatedAt
           );
 
         if (
           !Number.isNaN(
-            dataAtualizacao.getTime()
+            date.getTime()
           )
         ) {
-          updatedat = dataAtualizacao;
+          updatedat = date;
         }
       }
 
-      // =================================================
+      // -------------------------------------------------
       // VALIDAR
-      // =================================================
+      // -------------------------------------------------
 
       const missingFields = [];
 
       if (!String(clientname).trim()) {
-        missingFields.push("clientname");
+        missingFields.push(
+          "clientname"
+        );
       }
 
       if (!String(clientphone).trim()) {
-        missingFields.push("clientphone");
+        missingFields.push(
+          "clientphone"
+        );
       }
 
       if (!String(devicetype).trim()) {
-        missingFields.push("devicetype");
+        missingFields.push(
+          "devicetype"
+        );
       }
 
       if (
@@ -780,15 +768,12 @@ app.post(
       }
 
       if (!String(priority).trim()) {
-        missingFields.push("priority");
+        missingFields.push(
+          "priority"
+        );
       }
 
       if (missingFields.length > 0) {
-        console.error(
-          "❌ Campos ausentes na migração:",
-          missingFields
-        );
-
         return res.status(400).json({
           error:
             "Campos obrigatórios ausentes.",
@@ -796,71 +781,62 @@ app.post(
         });
       }
 
-      console.log(
-        "Dados normalizados para migração:",
-        {
-          clientname,
-          clientphone,
-          devicetype,
-          problemdescription,
-          priority,
-          status,
-          createdat,
-          updatedat,
-        }
-      );
-
-      // =================================================
+      // -------------------------------------------------
       // INSERIR
-      // =================================================
+      // -------------------------------------------------
 
-      const result = await pool.query(
-        `
-        INSERT INTO ordens_servico
-        (
-          clientname,
-          clientphone,
-          devicetype,
-          problemdescription,
-          priority,
-          status,
-          createdat,
-          updatedat
-        )
-        VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING
-          id,
-          clientname,
-          clientphone,
-          devicetype,
-          problemdescription,
-          priority,
-          status,
-          createdat,
-          updatedat
-        `,
-        [
-          String(clientname).trim(),
-          String(clientphone).trim(),
-          String(devicetype).trim(),
-          String(problemdescription).trim(),
-          String(priority).trim(),
-          String(status).trim(),
-          createdat,
-          updatedat,
-        ]
-      );
+      const result =
+        await pool.query(
+          `
+          INSERT INTO ordens_servico
+          (
+            clientname,
+            clientphone,
+            devicetype,
+            problemdescription,
+            priority,
+            status,
+            createdat,
+            updatedat
+          )
+          VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8)
+          RETURNING
+            id,
+            clientname,
+            clientphone,
+            devicetype,
+            problemdescription,
+            priority,
+            status,
+            createdat,
+            updatedat
+          `,
+          [
+            String(clientname).trim(),
+            String(clientphone).trim(),
+            String(devicetype).trim(),
+            String(
+              problemdescription
+            ).trim(),
+            String(priority).trim(),
+            String(status).trim(),
+            createdat,
+            updatedat,
+          ]
+        );
 
       console.log(
-        `✅ Ordem migrada. ID: ${result.rows[0].id}`
+        `✅ Ordem migrada: ID ${result.rows[0].id}`
       );
 
       res.status(201).json({
         message:
           "Ordem migrada com sucesso.",
-        id: result.rows[0].id,
-        order: result.rows[0],
+        id:
+          result.rows[0].id,
+        order:
+          result.rows[0],
       });
     } catch (err) {
       console.error(
@@ -869,7 +845,8 @@ app.post(
       );
 
       res.status(500).json({
-        error: "Erro ao migrar ordem.",
+        error:
+          "Erro ao migrar ordem.",
         details: err.message,
       });
     }
@@ -877,51 +854,183 @@ app.post(
 );
 
 // =====================================================
-// ROTA 404 PARA API
+// DELETE - EXCLUIR ORDEM
 // =====================================================
 
-app.use("/api", (req, res) => {
-  res.status(404).json({
-    error: "Rota da API não encontrada.",
-    method: req.method,
-    path: req.originalUrl,
-  });
-});
+app.delete(
+  "/api/ordens/:id",
+  async (req, res) => {
+    try {
+      const id =
+        Number.parseInt(
+          req.params.id,
+          10
+        );
+
+      if (Number.isNaN(id)) {
+        return res.status(400).json({
+          error:
+            "ID inválido.",
+        });
+      }
+
+      const result =
+        await pool.query(
+          `
+          DELETE FROM ordens_servico
+          WHERE id = $1
+          RETURNING *
+          `,
+          [id]
+        );
+
+      if (
+        result.rows.length === 0
+      ) {
+        return res.status(404).json({
+          error:
+            "Ordem não encontrada.",
+        });
+      }
+
+      console.log(
+        `✅ Ordem ${id} excluída.`
+      );
+
+      res.json({
+        message:
+          "Ordem excluída com sucesso.",
+        order:
+          result.rows[0],
+      });
+    } catch (err) {
+      console.error(
+        "❌ Erro ao excluir ordem:",
+        err
+      );
+
+      res.status(500).json({
+        error:
+          "Erro ao excluir ordem.",
+        details: err.message,
+      });
+    }
+  }
+);
 
 // =====================================================
-// ROTA 404 PARA OUTRAS PÁGINAS
+// PESQUISAR ORDENS
 // =====================================================
 
-app.use((req, res) => {
-  console.log(
-    `❌ Rota não encontrada: ${req.method} ${req.originalUrl}`
-  );
+app.get(
+  "/api/ordens/buscar",
+  async (req, res) => {
+    try {
+      const termo =
+        String(
+          req.query.termo || ""
+        ).trim();
 
-  res.status(404).send(
-    "Página não encontrada."
-  );
-});
+      if (!termo) {
+        const result =
+          await pool.query(`
+            SELECT
+              id,
+              clientname,
+              clientphone,
+              devicetype,
+              problemdescription,
+              priority,
+              status,
+              createdat,
+              updatedat
+            FROM ordens_servico
+            ORDER BY id DESC
+          `);
+
+        return res.json(
+          result.rows
+        );
+      }
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            id,
+            clientname,
+            clientphone,
+            devicetype,
+            problemdescription,
+            priority,
+            status,
+            createdat,
+            updatedat
+          FROM ordens_servico
+          WHERE
+            CAST(id AS TEXT) ILIKE $1
+            OR clientname ILIKE $1
+            OR clientphone ILIKE $1
+            OR devicetype ILIKE $1
+            OR problemdescription ILIKE $1
+            OR priority ILIKE $1
+            OR status ILIKE $1
+          ORDER BY id DESC
+          `,
+          [`%${termo}%`]
+        );
+
+      res.json(
+        result.rows
+      );
+    } catch (err) {
+      console.error(
+        "❌ Erro na pesquisa:",
+        err
+      );
+
+      res.status(500).json({
+        error:
+          "Erro ao pesquisar ordens.",
+        details: err.message,
+      });
+    }
+  }
+);
 
 // =====================================================
-// ERRO GLOBAL
+// ROTA 404 DA API
 // =====================================================
 
 app.use(
-  (err, req, res, next) => {
-    console.error(
-      "❌ ERRO INTERNO:",
-      err
+  "/api",
+  (req, res) => {
+    console.log(
+      `❌ API não encontrada: ${req.method} ${req.originalUrl}`
     );
 
-    if (res.headersSent) {
-      return next(err);
-    }
-
-    res.status(500).json({
+    res.status(404).json({
       error:
-        "Erro interno do servidor.",
-      details: err.message,
+        "Rota da API não encontrada.",
+      path:
+        req.originalUrl,
     });
+  }
+);
+
+// =====================================================
+// ROTA 404 GERAL
+// =====================================================
+
+app.use(
+  (req, res) => {
+    console.log(
+      `❌ Página não encontrada: ${req.method} ${req.originalUrl}`
+    );
+
+    res.status(404).send(
+      "Página não encontrada."
+    );
   }
 );
 
@@ -930,43 +1039,60 @@ app.use(
 // =====================================================
 
 async function iniciarServidor() {
-  await createTable();
+  try {
+    await createTable();
 
-  app.listen(PORT, () => {
-    console.log(
-      "=========================================="
+    app.listen(
+      PORT,
+      () => {
+        console.log(
+          "=========================================="
+        );
+
+        console.log(
+          "🚀 SERVIDOR INICIADO COM SUCESSO"
+        );
+
+        console.log(
+          `🚀 Porta: ${PORT}`
+        );
+
+        console.log(
+          "🗄️ Banco: Neon PostgreSQL"
+        );
+
+        console.log(
+          "📁 HTML: /views"
+        );
+
+        console.log(
+          "📁 Arquivos públicos: /public"
+        );
+
+        console.log(
+          "📜 JavaScript: /public/script.js"
+        );
+
+        console.log(
+          "🖼️ Imagens: /public"
+        );
+
+        console.log(
+          "=========================================="
+        );
+      }
     );
-
-    console.log(
-      `🚀 Servidor rodando na porta ${PORT}`
-    );
-
-    console.log(
-      `📱 Porta configurada: ${PORT}`
-    );
-
-    console.log(
-      "🗄️ Banco: Neon PostgreSQL"
-    );
-
-    console.log(
-      "📄 JavaScript: /script.js"
-    );
-
-    console.log(
-      "=========================================="
-    );
-  });
-}
-
-iniciarServidor().catch(
-  (err) => {
+  } catch (err) {
     console.error(
-      "❌ Erro fatal ao iniciar servidor:",
+      "❌ ERRO FATAL AO INICIAR:",
       err
     );
+
+    process.exit(1);
   }
-);
+}
+
+iniciarServidor();
 
 // =====================================================
 // ENCERRAMENTO
@@ -976,18 +1102,18 @@ async function encerrarServidor(
   sinal
 ) {
   console.log(
-    `🛑 Recebido ${sinal}. Encerrando servidor...`
+    `🛑 Recebido ${sinal}. Encerrando...`
   );
 
   try {
     await pool.end();
 
     console.log(
-      "✅ Pool de conexões fechado."
+      "✅ Conexão com banco encerrada."
     );
   } catch (err) {
     console.error(
-      "❌ Erro ao fechar pool:",
+      "❌ Erro ao fechar banco:",
       err
     );
   }
