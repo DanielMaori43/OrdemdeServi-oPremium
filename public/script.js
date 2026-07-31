@@ -1,76 +1,130 @@
- 
-// URL base da sua API no Render
-const API_BASE = "https://ordemdeservi-opremium.onrender.com";
+// Variável global para armazenar as ordens de serviço
+let serviceOrders = []
+// =====================================================
+// FUNÇÕES PARA TRATAMENTO DE DATAS
+// =====================================================
 
+function parseOrderDate(value) {
+  if (!value) {
+    return null
+  }
+
+  // Já é um objeto Date
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value
+  }
+
+  const stringValue = String(value).trim()
+
+  if (!stringValue) {
+    return null
+  }
+
+  // Formato brasileiro: DD/MM/YYYY
+  const brMatch = stringValue.match(
+    /^(\d{2})\/(\d{2})\/(\d{4})$/
+  )
+
+  if (brMatch) {
+    const [, day, month, year] = brMatch
+
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    )
+
+    return Number.isNaN(date.getTime()) ? null : date
+  }
+
+  // Tenta interpretar datas ISO/PostgreSQL
+  const date = new Date(stringValue)
+
+  if (!Number.isNaN(date.getTime())) {
+    return date
+  }
+
+  return null
+}
+
+function formatOrderDate(value) {
+  const date = parseOrderDate(value)
+
+  if (!date) {
+    return "Data não disponível"
+  }
+
+  return date.toLocaleDateString("pt-BR")
+}
 // Função para carregar todas as ordens do servidor
 async function loadServiceOrders() {
   try {
-    const response = await fetch(`${API_BASE}/api/ordens`);
+    const response = await fetch("/api/ordens")
     if (!response.ok) {
-      throw new Error("Erro ao carregar ordens de serviço");
+      throw new Error("Erro ao carregar ordens de serviço")
     }
-    serviceOrders = await response.json();
-    return serviceOrders;
+    serviceOrders = await response.json()
+    return serviceOrders
   } catch (error) {
-    console.error("Erro:", error);
-    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.");
-    return [];
+    console.error("Erro:", error)
+    alert("Não foi possível carregar as ordens de serviço. Tente novamente mais tarde.")
+    return []
   }
 }
 
 // Função para criar uma nova ordem de serviço
 async function createServiceOrder(orderData) {
   try {
-    const response = await fetch(`${API_BASE}/api/ordens`, {
+    const response = await fetch("/api/ordens", {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(orderData),
-    });
+    })
 
     if (!response.ok) {
-      throw new Error("Erro ao criar ordem de serviço");
+      throw new Error("Erro ao criar ordem de serviço")
     }
 
-    const result = await response.json();
+    const result = await response.json()
 
     // Recarregar as ordens após criar uma nova
-    await loadServiceOrders();
+    await loadServiceOrders()
 
-    return result;
+    return result
   } catch (error) {
-    console.error("Erro:", error);
-    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.");
-    throw error;
+    console.error("Erro:", error)
+    alert("Não foi possível criar a ordem de serviço. Tente novamente mais tarde.")
+    throw error
   }
 }
 
 // Função para atualizar o status de uma ordem
 async function updateOrderStatusAPI(orderId, newStatus) {
   try {
-    const response = await fetch(`${API_BASE}/api/ordens/${orderId}/status`, {
+    const response = await fetch(`/api/ordens/${orderId}/status`, {
       method: "PUT",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ status: newStatus }),
-    });
+    })
 
     if (!response.ok) {
-      throw new Error("Erro ao atualizar status da ordem");
+      throw new Error("Erro ao atualizar status da ordem")
     }
 
-    const result = await response.json();
+    const result = await response.json()
 
     // Recarregar as ordens após atualizar
-    await loadServiceOrders();
+    await loadServiceOrders()
 
-    return result;
+    return result
   } catch (error) {
-    console.error("Erro:", error);
-    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.");
-    throw error;
+    console.error("Erro:", error)
+    alert("Não foi possível atualizar o status da ordem. Tente novamente mais tarde.")
+    throw error
   }
 }
 
@@ -91,10 +145,10 @@ async function migrateLocalStorageToServer() {
       let migratedCount = 0
       for (const order of localOrders) {
         try {
-          const response = await fetch(`${API_BASE}/api/ordens/migrate`, {
+          const response = await fetch("/api/ordens/migrate", {
             method: "POST",
             headers: {
-              "Content-type": "application/json",
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(order),
           })
@@ -213,7 +267,7 @@ function handleOptionClick(option) {
                 <form id="service-order-form">
                     <div class="form-group">
                         <label for="clientname">Nome do Cliente:</label>
-                        <input type="text" id="clientname" required>
+                         <input type="text" id="clientname" required>
                     </div>
                     <div class="form-group">
                         <label for="clientphone">Telefone:</label>
@@ -235,8 +289,8 @@ function handleOptionClick(option) {
                         <textarea id="problemdescription" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="service-priority">Prioridade:</label>
-                        <select id="service-priority" required>
+                        <label for="servicepriority">Prioridade:</label>
+                        <select id="servicepriority" required>
                             <option value="baixa">Baixa</option>
                             <option value="media" selected>Média</option>
                             <option value="alta">Alta</option>
@@ -271,22 +325,14 @@ function handleOptionClick(option) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault()
 
- 
       // Criar nova ordem de serviço
- console.log("clientname", document.getElementById("clientname"));
-console.log("clientphone", document.getElementById("clientphone"));
-console.log("devicetype", document.getElementById("devicetype"));
-console.log("problemdescription", document.getElementById("problemdescription"));
-console.log("service-priority", document.getElementById("service-priority"));
-
-const newOrder = {
-  clientname: document.getElementById("clientname").value,
-  clientphone: document.getElementById("clientphone").value,
-  devicetype: document.getElementById("devicetype").value,
-  problemdescription: document.getElementById("problemdescription").value,
-  priority: document.getElementById("service-priority").value,
+      const newOrder = {
+        clientname: document.getElementById("clientname").value,
+        clientphone: document.getElementById("clientphone").value,
+        devicetype: document.getElementById("devicetype").value,
+        problemdescription: document.getElementById("problemdescription").value,
+        priority: document.getElementById("servicepriority").value,
       }
-      
 
       try {
         // Enviar para o servidor
@@ -387,6 +433,7 @@ const newOrder = {
     // Manipular envio do formulário
     const form = modal.querySelector("#check-status-form")
     form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", (e) => {
       e.preventDefault()
 
       const orderId = Number.parseInt(document.getElementById("order-id").value)
@@ -394,11 +441,11 @@ const newOrder = {
 
       // Procurar a ordem pelo ID
       const order = serviceOrders.find((order) => order.id === orderId)
-
+     
       if (order) {
         // Formatar data
         const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
-        const updatedDate = new Date(order.updatedat).toLocaleDateString("pt-BR")
+      const updatedDate = formatOrderDate(order.updatedat || order.updatedat)
 
         // Traduzir status
         let statusText = ""
@@ -418,25 +465,44 @@ const newOrder = {
           default:
             statusText = order.status
         }
+   
+        // Mostrar resultado com botão para atualizar status
+       const cliente =
+  order.clientname ||
+  order.clientName ||
+  "Não informado"
 
-    // Mostrar resultado com botão para atualizar status
+const telefone =
+  order.clientphone ||
+  order.clientPhone ||
+  "Não informado"
+
+const dispositivo =
+  order.devicetype ||
+  order.deviceType ||
+  "Não informado"
+
 resultDiv.innerHTML = `
-  <h3>Ordem de Serviço #${order.id}</h3>
-  <p><strong>Cliente:</strong> ${order.clientname}</p>
-  <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
-  <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
-  <p><strong>Criada em:</strong> ${createdDate}</p>
-  <p><strong>Última atualização:</strong> ${updatedDate}</p>
-  ${
-    order.status !== "concluido" && order.status !== "cancelado"
-      ? `<div class="action-buttons">
-            <button id="update-status-btn" class="update-status-btn" data-id="${order.id}">
-              Atualizar Status
-            </button>
-         </div>`
-      : ""
-  }
-`
+        <h3>Ordem de Serviço #${order.id}</h3>
+        <p><strong>Cliente:</strong> ${cliente}</p>
+        <p><strong>Telefone:</strong> ${telefone}</p>
+        <p><strong>Dispositivo:</strong> ${dispositivo}</p>
+        <p><strong>Status:</strong> <span class="status-${order.status}">${statusText}</span></p>
+        <p><strong>Criada em:</strong> ${createdDate}</p>
+        <p><strong>Última atualização:</strong> ${updatedDate}</p>
+      
+        <!-- Botão desabilitado na tela de rastreio
+        ${
+          order.status !== "concluido" && order.status !== "cancelado"
+            ? `<div class="action-buttons">
+                  <button id="update-status-btn" class="update-status-btn" data-id="${order.id}">
+                    Atualizar Status
+                  </button>
+               </div>`
+            : ""
+        }
+        `
+
         // Adicionar event listener para o botão de atualizar status
         const updateStatusBtn = document.getElementById("update-status-btn")
         if (updateStatusBtn) {
@@ -976,7 +1042,7 @@ resultDiv.innerHTML = `
       
       <div class="content">
         <div class="section">
-          <div class="section-title">Dados do Cliente</div>
+          <div class="section-title">Dados do cliente</div>
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Nome:</div>
@@ -1046,7 +1112,7 @@ resultDiv.innerHTML = `
               <li>O prazo para conclusão do serviço será informado após avaliação técnica.</li>
               <li>Garantia de 90 dias para os serviços realizados.</li>
               <li>Equipamentos não retirados após 30 dias serão considerados abandonados.</li>
-              <li>O e declara estar ciente e de acordo com os termos acima.</li>
+              <li>O cliente declara estar ciente e de acordo com os termos acima.</li>
             </ol>
           </div>
         </div>
@@ -1307,6 +1373,14 @@ resultDiv.innerHTML = `
   // Função para visualizar detalhes de uma ordem
   function viewOrderDetails(orderId) {
     const order = serviceOrders.find((order) => order.id === orderId)
+    console.log("===== RASTREIO =====")
+console.log("ID selecionado:", orderId)
+console.log("ORDEM ENCONTRADA:", order)
+console.log("CLIENTNAME:", order?.clientname)
+console.log("CLIENTNAME:", order?.clientName)
+console.log("CLIENTPHONE:", order?.clientphone)
+console.log("CLIENTPHONE:", order?.clientPhone)
+console.log("====================")
 
     if (!order) {
       alert(`Ordem de serviço #${orderId} não encontrada.`)
@@ -1497,7 +1571,7 @@ resultDiv.innerHTML = `
       const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
       // Adicionar opção ao select
-      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientName} - ${order.devicetype} - ${statusText}</option>`
+      ordersOptions += `<option value="${order.id}">OS #${order.id} - ${order.clientname} - ${order.devicetype} - ${statusText}</option>`
     })
 
     // Conteúdo do modal
@@ -1644,6 +1718,7 @@ resultDiv.innerHTML = `
 
     // Manipular envio do formulário
     const form = modal.querySelector("#track-form")
+    console.log("FORMULÁRIO DO RASTREIO:", form)
     form.addEventListener("submit", (e) => {
       e.preventDefault()
 
@@ -1652,7 +1727,9 @@ resultDiv.innerHTML = `
 
       // Procurar a ordem pelo ID
       const order = serviceOrders.find((order) => order.id === orderId)
-
+      console.log("ID selecionado:", orderId)
+      console.log("Todas as ordens:", serviceOrders)
+      console.log("ORDEM ENCONTRADA NO RASTREIO:", order)
       if (order) {
         // Criar timeline baseada no status
         let timelineHTML = `
@@ -1726,8 +1803,8 @@ resultDiv.innerHTML = `
         // Mostrar resultado
         resultDiv.innerHTML = `
         <h3>Ordem de Serviço #${order.id}</h3>
-        <p><strong>Cliente:</strong> ${order.clientName}</p>
-        <p><strong>Telefone:</strong> ${order.clientPhone}</p>
+        <p><strong>Cliente:</strong> ${order.clientname}</p>
+        <p><strong>Telefone:</strong> ${order.clientphone}</p>
         <p><strong>Dispositivo:</strong> ${order.devicetype}</p>
         ${timelineHTML}
         <div class="share-buttons">
@@ -1771,7 +1848,7 @@ resultDiv.innerHTML = `
             const message = `
 *Atualização da Ordem de Serviço #${order.id}*
 
-Olá ${order.clientName},
+Olá ${order.clientname || "cliente"},
 
 Aqui está o status atual do seu serviço:
 
@@ -1785,7 +1862,7 @@ Agradecemos a preferência!
 
             // Criar URL do WhatsApp com o número do cliente e a mensagem
             // Remover caracteres não numéricos do telefone
-            const phoneNumber = order.clientphone.replace(/\D/g, "")
+            const phoneNumber = (order.clientphone || "").replace(/\D/g, "")
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
             // Abrir o WhatsApp
@@ -1815,12 +1892,3 @@ Agradecemos a preferência!
     })
   }
 })
-// Variável global para armazenar as ordens
-let serviceOrders = [];
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js")
-      .then(() => console.log("Service Worker registrado com sucesso."))
-      .catch(err => console.error("Erro ao registrar Service Worker:", err));
-  });
-}
