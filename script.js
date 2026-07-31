@@ -1717,6 +1717,7 @@ console.log("====================")
 
     // Manipular envio do formulário
     const form = modal.querySelector("#track-form")
+    console.log("FORMULÁRIO DO RASTREIO:", form)
     form.addEventListener("submit", (e) => {
       e.preventDefault()
 
