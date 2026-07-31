@@ -24,7 +24,33 @@ const pool = new Pool({
 
 app.use(cors())
 app.use(express.json())
+// =====================================================
+// ARQUIVOS ESTÁTICOS
+// =====================================================
+
+// Arquivos dentro de /public
 app.use(express.static(path.join(__dirname, "public")))
+
+// Arquivos específicos que estão FORA de /public
+app.get("/script.js", (req, res) => {
+  const file = path.join(__dirname, "script.js")
+
+  if (fs.existsSync(file)) {
+    return res.sendFile(file)
+  }
+
+  res.status(404).send("script.js não encontrado")
+})
+
+app.get("/styles.css", (req, res) => {
+  const file = path.join(__dirname, "styles.css")
+
+  if (fs.existsSync(file)) {
+    return res.sendFile(file)
+  }
+
+  res.status(404).send("styles.css não encontrado")
+})
 
 // =====================================================
 // CRIAR / VERIFICAR TABELA
