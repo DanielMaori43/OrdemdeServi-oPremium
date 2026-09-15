@@ -1169,7 +1169,7 @@ function baixarPDF() {
     areaPDF.style.position = "absolute";
     areaPDF.style.left = "0";
     areaPDF.style.top = "0";
-    areaPDF.style.width = "800px";
+    areaPDF.style.width = "700px";
     areaPDF.style.margin = "0";
     areaPDF.style.padding = "0";
     areaPDF.style.background = "#ffffff";
@@ -1189,7 +1189,7 @@ function baixarPDF() {
         },
 
         html2canvas: {
-            scale: 2,
+            scale: 1.5,
             useCORS: true,
             logging: false,
             backgroundColor: "#ffffff",
