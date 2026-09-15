@@ -1186,10 +1186,10 @@ function baixarPDF() {
             alert("Não foi possível gerar o PDF.");
         });
 }
-</script> 
+  </script> 
 
 </body>
-  </html>
+</html>
 `)
 
         printWindow.document.close()
