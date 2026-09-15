@@ -1134,7 +1134,7 @@ resultDiv.innerHTML = `
     </div>
     
     <div style="text-align: center; margin-top: 20px;">
-      <button onclick="window.print();" class="print-button">Imprimir</button>
+    <button onclick="window.print();" class="print-button">Imprimir</button>
     </div>
   </body>
   </html>
