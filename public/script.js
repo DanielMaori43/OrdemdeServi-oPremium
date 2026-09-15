@@ -1189,7 +1189,7 @@ function baixarPDF() {
         },
 
         html2canvas: {
-            scale: 1.5,
+            scale: 2,
             useCORS: true,
             logging: false,
             backgroundColor: "#ffffff",
