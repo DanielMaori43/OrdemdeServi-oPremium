@@ -1148,13 +1148,19 @@ function baixarPDF() {
 
     const elemento = document.querySelector(".container");
 
+    if (!elemento) {
+        alert("Não foi possível encontrar o conteúdo da Ordem de Serviço.");
+        return;
+    }
+
     const opcoes = {
-        margin: [5, 5, 5, 5],
-        filename: "Ordem_de_Servico_${order.id}.pdf",
+        margin: 5,
+
+        filename: `Ordem_de_Servico_${order.id}.pdf`,
 
         image: {
             type: "jpeg",
-            quality: 1
+            quality: 0.98
         },
 
         html2canvas: {
@@ -1168,19 +1174,21 @@ function baixarPDF() {
             unit: "mm",
             format: "a4",
             orientation: "portrait"
-        },
-
-        pagebreak: {
-            mode: ["css", "legacy"]
         }
     };
 
     html2pdf()
         .set(opcoes)
         .from(elemento)
-        .save();
+        .save()
+        .catch(function (erro) {
+            console.error("Erro ao gerar PDF:", erro);
+            alert("Não foi possível gerar o PDF.");
+        });
 }
-</script>  </body>
+</script> 
+
+</body>
   </html>
 `)
 
