@@ -808,6 +808,8 @@ resultDiv.innerHTML = `
   <html>
   <head>
     <title>Ordem de Serviço #${order.id}</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
       
@@ -1130,7 +1132,45 @@ resultDiv.innerHTML = `
     
     <div style="text-align: center; margin-top: 20px;">
      <button onclick="window.print();" class="print-button">Imprimir</button>
+
+     <button onclick="baixarPDF()" class="print-button">
+        📄 Baixar PDF
+    </button>
     </div>
+
+    <script>
+    function baixarPDF() {
+        if (typeof html2pdf === "undefined") {
+            alert("Não foi possível carregar o gerador de PDF. Verifique sua conexão com a internet.");
+            return;
+        }
+
+        const elemento = document.querySelector(".container");
+
+        const opcoes = {
+            margin: 10,
+            filename: "Ordem_de_Servico_${order.id}.pdf",
+            image: {
+                type: "jpeg",
+                quality: 0.98
+            },
+            html2canvas: {
+                scale: 2,
+                useCORS: true
+            },
+            jsPDF: {
+                unit: "mm",
+                format: "a4",
+                orientation: "portrait"
+            }
+        };
+
+        html2pdf()
+            .set(opcoes)
+            .from(elemento)
+            .save();
+    }
+</script>
   </body>
   </html>
 `)
