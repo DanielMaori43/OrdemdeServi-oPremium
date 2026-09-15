@@ -1139,39 +1139,48 @@ resultDiv.innerHTML = `
     </div>
 
     <script>
-    function baixarPDF() {
-        if (typeof html2pdf === "undefined") {
-            alert("Não foi possível carregar o gerador de PDF. Verifique sua conexão com a internet.");
-            return;
-        }
-
-        const elemento = document.querySelector(".container");
-
-        const opcoes = {
-            margin: 10,
-            filename: "Ordem_de_Servico_${order.id}.pdf",
-            image: {
-                type: "jpeg",
-                quality: 0.98
-            },
-            html2canvas: {
-                scale: 2,
-                useCORS: true
-            },
-            jsPDF: {
-                unit: "mm",
-                format: "a4",
-                orientation: "portrait"
-            }
-        };
-
-        html2pdf()
-            .set(opcoes)
-            .from(elemento)
-            .save();
+  <script>
+function baixarPDF() {
+    if (typeof html2pdf === "undefined") {
+        alert("Não foi possível carregar o gerador de PDF. Verifique sua conexão com a internet.");
+        return;
     }
-</script>
-  </body>
+
+    const elemento = document.querySelector(".container");
+
+    const opcoes = {
+        margin: [5, 5, 5, 5],
+        filename: "Ordem_de_Servico_${order.id}.pdf",
+
+        image: {
+            type: "jpeg",
+            quality: 1
+        },
+
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: "#ffffff"
+        },
+
+        jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait"
+        },
+
+        pagebreak: {
+            mode: ["css", "legacy"]
+        }
+    };
+
+    html2pdf()
+        .set(opcoes)
+        .from(elemento)
+        .save();
+}
+</script>  </body>
   </html>
 `)
 
