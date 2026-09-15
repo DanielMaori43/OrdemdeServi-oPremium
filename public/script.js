@@ -1146,12 +1146,37 @@ function baixarPDF() {
         return;
     }
 
-    const elemento = document.querySelector(".container");
+    const original = document.querySelector(".container");
 
-    if (!elemento) {
+    if (!original) {
         alert("Não foi possível encontrar o conteúdo da Ordem de Serviço.");
         return;
     }
+
+    // Cria uma cópia somente para gerar o PDF
+    const elemento = original.cloneNode(true);
+
+    elemento.style.margin = "0";
+    elemento.style.padding = "0";
+    elemento.style.maxWidth = "800px";
+    elemento.style.width = "800px";
+    elemento.style.boxShadow = "none";
+    elemento.style.borderRadius = "0";
+
+    // Cria uma área temporária fora da página visível
+    const areaPDF = document.createElement("div");
+
+    areaPDF.style.position = "absolute";
+    areaPDF.style.left = "0";
+    areaPDF.style.top = "0";
+    areaPDF.style.width = "800px";
+    areaPDF.style.margin = "0";
+    areaPDF.style.padding = "0";
+    areaPDF.style.background = "#ffffff";
+    areaPDF.style.zIndex = "-9999";
+
+    areaPDF.appendChild(elemento);
+    document.body.appendChild(areaPDF);
 
     const opcoes = {
         margin: 3,
@@ -1163,12 +1188,14 @@ function baixarPDF() {
             quality: 0.98
         },
 
-       html2canvas: {
-        scale: 1.5,
-        useCORS: true,
-        logging: false,
-       backgroundColor: "#ffffff"
-    },
+        html2canvas: {
+            scale: 1.5,
+            useCORS: true,
+            logging: false,
+            backgroundColor: "#ffffff",
+            scrollX: 0,
+            scrollY: 0
+        },
 
         jsPDF: {
             unit: "mm",
@@ -1181,8 +1208,16 @@ function baixarPDF() {
         .set(opcoes)
         .from(elemento)
         .save()
+        .then(function () {
+            // Remove a cópia depois de gerar o PDF
+            areaPDF.remove();
+        })
         .catch(function (erro) {
             console.error("Erro ao gerar PDF:", erro);
+
+            // Remove a cópia mesmo se der erro
+            areaPDF.remove();
+
             alert("Não foi possível gerar o PDF.");
         });
 }
