@@ -1466,31 +1466,18 @@ console.log("====================")
     })
 
     // Adicionar event listeners para botões
-    const printButton = modal.querySelector(".print-detail-btn")
-    if (printButton) {
-      printButton.addEventListener("click", function () {
-        const orderId = Number.parseInt(this.getAttribute("data-id"))
+ const printButton = modal.querySelector(".print-detail-btn")
 
-        // Fechar modal atual
-        modal.style.opacity = "0"
-        setTimeout(() => {
-          modal.remove()
+if (printButton) {
+  printButton.addEventListener("click", function () {
+    // Fechar o modal atual
+    modal.style.opacity = "0"
+    modal.remove()
 
-          // Abrir modal de impressão e simular clique no botão
-          printServiceOrder()
-          setTimeout(() => {
-            const printInput = document.getElementById("print-order-id")
-            if (printInput) {
-              printInput.value = orderId
-              const printForm = document.getElementById("print-form")
-              if (printForm) {
-                printForm.dispatchEvent(new Event("submit"))
-              }
-            }
-          }, 500)
-        }, 300)
-      })
-    }
+    // Abrir o modal de seleção de OS
+    printServiceOrder()
+  })
+}
 
     const updateButton = modal.querySelector(".update-detail-btn")
     if (updateButton) {
