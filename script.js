@@ -780,6 +780,11 @@ resultDiv.innerHTML = `
         // Criar janela de impressão
         const printWindow = window.open("", "_blank")
 
+        if (!printWindow) {
+  alert("O navegador bloqueou a janela de impressão. Permita pop-ups para este site e tente novamente.")
+  return
+}
+
         // Formatar data
         const createdDate = new Date(order.createdat).toLocaleDateString("pt-BR")
 
@@ -1129,7 +1134,7 @@ resultDiv.innerHTML = `
     </div>
     
     <div style="text-align: center; margin-top: 20px;">
-      <button onclick="window.print(); window.close();" class="print-button">Imprimir</button>
+      <button onclick="window.print();" class="print-button">Imprimir</button>
     </div>
   </body>
   </html>
