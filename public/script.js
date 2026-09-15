@@ -1179,7 +1179,7 @@ function baixarPDF() {
     document.body.appendChild(areaPDF);
 
     const opcoes = {
-        margin: 3.5,
+        margin: 2,
 
         filename: "Ordem_de_Servico_${order.id}.pdf",
 
