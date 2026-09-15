@@ -1156,7 +1156,7 @@ function baixarPDF() {
     const opcoes = {
         margin: 5,
 
-        filename: `Ordem_de_Servico_${order.id}.pdf`,
+        filename: "Ordem_de_Servico_${order.id}.pdf",
 
         image: {
             type: "jpeg",
