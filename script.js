@@ -1159,8 +1159,8 @@ resultDiv.innerHTML = `
 
     elemento.style.margin = "0";
     elemento.style.padding = "0";
-    elemento.style.maxWidth = "700px";
-    elemento.style.width = "700px";
+    elemento.style.maxWidth = "780px";
+    elemento.style.width = "780px";
     elemento.style.boxShadow = "none";
     elemento.style.borderRadius = "0";
 
@@ -1170,7 +1170,7 @@ resultDiv.innerHTML = `
     areaPDF.style.position = "absolute";
     areaPDF.style.left = "0";
     areaPDF.style.top = "0";
-    areaPDF.style.width = "700px";
+    areaPDF.style.width = "7800px";
     areaPDF.style.margin = "0";
     areaPDF.style.padding = "0";
     areaPDF.style.background = "#ffffff";
