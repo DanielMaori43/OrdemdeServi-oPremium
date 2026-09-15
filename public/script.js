@@ -1163,12 +1163,12 @@ function baixarPDF() {
             quality: 0.98
         },
 
-        html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: "#ffffff"
-        },
+       html2canvas: {
+        scale: 1.5,
+        useCORS: true,
+        logging: false,
+       backgroundColor: "#ffffff"
+    },
 
         jsPDF: {
             unit: "mm",
