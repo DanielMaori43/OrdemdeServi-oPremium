@@ -1158,8 +1158,8 @@ function baixarPDF() {
 
     elemento.style.margin = "0";
     elemento.style.padding = "0";
-    elemento.style.maxWidth = "700px";
-    elemento.style.width = "700px";
+    elemento.style.maxWidth = "780px";
+    elemento.style.width = "780px";
     elemento.style.boxShadow = "none";
     elemento.style.borderRadius = "0";
 
@@ -1169,7 +1169,7 @@ function baixarPDF() {
     areaPDF.style.position = "absolute";
     areaPDF.style.left = "0";
     areaPDF.style.top = "0";
-    areaPDF.style.width = "700px";
+    areaPDF.style.width = "780px";
     areaPDF.style.margin = "0";
     areaPDF.style.padding = "0";
     areaPDF.style.background = "#ffffff";
@@ -1179,7 +1179,7 @@ function baixarPDF() {
     document.body.appendChild(areaPDF);
 
     const opcoes = {
-        margin: 5,
+        margin: 3,
 
         filename: "Ordem_de_Servico_${order.id}.pdf",
 
