@@ -1154,7 +1154,7 @@ function baixarPDF() {
     }
 
     const opcoes = {
-        margin: 5,
+        margin: 3,
 
         filename: "Ordem_de_Servico_${order.id}.pdf",
 
