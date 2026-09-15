@@ -1138,7 +1138,7 @@ resultDiv.innerHTML = `
     </button>
     </div>
 
-    <script>
+   
   <script>
 function baixarPDF() {
     if (typeof html2pdf === "undefined") {
