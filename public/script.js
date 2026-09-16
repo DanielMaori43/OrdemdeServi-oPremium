@@ -1169,7 +1169,7 @@ function baixarPDF() {
     areaPDF.style.position = "absolute";
     areaPDF.style.left = "0";
     areaPDF.style.top = "0";
-    areaPDF.style.width = "780px";
+    areaPDF.style.width = "980px";
     areaPDF.style.margin = "0";
     areaPDF.style.padding = "0";
     areaPDF.style.background = "#ffffff";
