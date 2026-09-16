@@ -1158,8 +1158,8 @@ function baixarPDF() {
 
     elemento.style.margin = "0";
     elemento.style.padding = "0";
-    elemento.style.maxWidth = "790px";
-    elemento.style.width = "790px";
+    elemento.style.maxWidth = "690px";
+    elemento.style.width = "690px";
     elemento.style.boxShadow = "none";
     elemento.style.borderRadius = "0";
 
